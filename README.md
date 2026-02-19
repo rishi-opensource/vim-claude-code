@@ -22,20 +22,20 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 ### [vim-plug](https://github.com/junegunn/vim-plug)
 
 ```vim
-Plug 'rishi-opensource/claude-code.vim'
+Plug 'rishi-opensource/vim-claude-code'
 ```
 
 ### [Vundle](https://github.com/VundleVim/Vundle.vim)
 
 ```vim
-Plugin 'rishi-opensource/claude-code.vim'
+Plugin 'rishi-opensource/vim-claude-code'
 ```
 
 ### [pathogen](https://github.com/tpope/vim-pathogen)
 
 ```sh
 cd ~/.vim/bundle
-git clone https://github.com/rishi-opensource/claude-code.vim.git
+git clone https://github.com/rishi-opensource/vim-claude-code.git
 ```
 
 ### Manual
