@@ -54,24 +54,26 @@ After installation, generate help tags: >
 ==============================================================================
 4. COMMANDS                                         *claude-code-commands*
 
-                                                           *:ClaudeCode*
-:ClaudeCode
+                                                               *:Claude*
+:Claude
     Toggle the Claude Code terminal.  If a terminal for the current
     project exists and is visible, it is hidden.  If hidden, it is
     shown again.  If no terminal exists, a new one is created.
 
-                                                   *:ClaudeCodeContinue*
-:ClaudeCodeContinue
+    Subcommands are tab-completable.
+
+                                                      *:Claude-continue*
+:Claude continue
     Toggle Claude Code with the --continue flag, which resumes the
     most recent conversation.
 
-                                                     *:ClaudeCodeResume*
-:ClaudeCodeResume
+                                                        *:Claude-resume*
+:Claude resume
     Toggle Claude Code with the --resume flag, which presents an
     interactive conversation picker.
 
-                                                    *:ClaudeCodeVerbose*
-:ClaudeCodeVerbose
+                                                       *:Claude-verbose*
+:Claude verbose
     Toggle Claude Code with the --verbose flag for detailed logging.
 
 ==============================================================================
@@ -213,8 +215,8 @@ Default keymaps (when |g:claude_code_map_keys| is 1):
 To disable default keymaps and define your own: >
     let g:claude_code_map_keys = 0
 
-    nnoremap <Leader>cc :ClaudeCode<CR>
-    tnoremap <Leader>cc <C-\><C-n>:ClaudeCode<CR>
+    nnoremap <Leader>cc :Claude<CR>
+    tnoremap <Leader>cc <C-\><C-n>:Claude<CR>
 <
 
 ==============================================================================
