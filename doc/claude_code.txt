@@ -1,0 +1,270 @@
+*claude_code.txt*   Claude Code CLI integration for Vim
+
+Author:  Claude Code Vim Plugin
+License: MIT
+
+==============================================================================
+CONTENTS                                              *claude-code-contents*
+
+    1. Introduction .......................... |claude-code-intro|
+    2. Requirements .......................... |claude-code-requirements|
+    3. Installation .......................... |claude-code-installation|
+    4. Commands .............................. |claude-code-commands|
+    5. Configuration ......................... |claude-code-config|
+    6. Keymaps ............................... |claude-code-keymaps|
+    7. Window Modes .......................... |claude-code-windows|
+    8. File Refresh .......................... |claude-code-refresh|
+    9. Git Integration ....................... |claude-code-git|
+
+==============================================================================
+1. INTRODUCTION                                          *claude-code-intro*
+
+claude-code.vim provides seamless integration between the Claude Code CLI
+and the Vim editor.  It allows you to toggle a Claude Code terminal inside
+Vim, automatically detects file changes made by Claude, and supports
+multiple window layouts and per-repository instances.
+
+==============================================================================
+2. REQUIREMENTS                                   *claude-code-requirements*
+
+- Vim 8.2+ compiled with |+terminal| support
+- Claude Code CLI installed and available in $PATH
+  (https://docs.anthropic.com/en/docs/claude-code)
+- Optional: Vim 8.2+ with |+popupwin| for floating window mode
+
+==============================================================================
+3. INSTALLATION                                   *claude-code-installation*
+
+Using vim-plug: >
+    Plug 'your-user/claude-code.vim'
+<
+Using Vundle: >
+    Plugin 'your-user/claude-code.vim'
+<
+Using pathogen: >
+    cd ~/.vim/bundle
+    git clone https://github.com/your-user/claude-code.vim.git
+<
+Manual: copy the plugin/, autoload/, and doc/ directories into ~/.vim/
+
+After installation, generate help tags: >
+    :helptags ALL
+<
+
+==============================================================================
+4. COMMANDS                                         *claude-code-commands*
+
+                                                           *:ClaudeCode*
+:ClaudeCode
+    Toggle the Claude Code terminal.  If a terminal for the current
+    project exists and is visible, it is hidden.  If hidden, it is
+    shown again.  If no terminal exists, a new one is created.
+
+                                                   *:ClaudeCodeContinue*
+:ClaudeCodeContinue
+    Toggle Claude Code with the --continue flag, which resumes the
+    most recent conversation.
+
+                                                     *:ClaudeCodeResume*
+:ClaudeCodeResume
+    Toggle Claude Code with the --resume flag, which presents an
+    interactive conversation picker.
+
+                                                    *:ClaudeCodeVerbose*
+:ClaudeCodeVerbose
+    Toggle Claude Code with the --verbose flag for detailed logging.
+
+==============================================================================
+5. CONFIGURATION                                     *claude-code-config*
+
+All configuration uses |g:| variables.  Buffer-local |b:| overrides are
+also supported (b:claude_code_<key> takes precedence over g:claude_code_<key>).
+
+Set these in your |vimrc| BEFORE the plugin loads (or use an |after|
+directory).
+
+                                              *g:claude_code_command*
+g:claude_code_command ~
+    The CLI executable to run.
+    Default: 'claude'
+
+                                           *g:claude_code_split_ratio*
+g:claude_code_split_ratio ~
+    Fraction of the screen used by the terminal window (0.0 – 1.0).
+    Default: 0.3
+
+                                             *g:claude_code_position*
+g:claude_code_position ~
+    Window layout.  One of:
+      'botright'  - horizontal split at the bottom (default)
+      'topleft'   - horizontal split at the top
+      'vertical'  - vertical split on the right
+      'float'     - popup window (requires +popupwin)
+      'tab'       - dedicated tab
+    Default: 'botright'
+
+                                         *g:claude_code_enter_insert*
+g:claude_code_enter_insert ~
+    Automatically enter Terminal mode when focusing the Claude window.
+    Default: 1
+
+                                         *g:claude_code_hide_numbers*
+g:claude_code_hide_numbers ~
+    Hide line numbers in the terminal window.
+    Default: 1
+
+                                      *g:claude_code_hide_signcolumn*
+g:claude_code_hide_signcolumn ~
+    Hide the sign column in the terminal window.
+    Default: 1
+
+                                         *g:claude_code_use_git_root*
+g:claude_code_use_git_root ~
+    Change to the git repository root before starting Claude.
+    Default: 1
+
+                                       *g:claude_code_multi_instance*
+g:claude_code_multi_instance ~
+    Maintain separate terminal instances per git repository.
+    Default: 1
+
+                                             *g:claude_code_map_keys*
+g:claude_code_map_keys ~
+    Register default keymaps.  Set to 0 to define your own.
+    Default: 1
+
+                                       *g:claude_code_refresh_enable*
+g:claude_code_refresh_enable ~
+    Enable automatic file-change detection and reload.
+    Default: 1
+
+                                     *g:claude_code_refresh_interval*
+g:claude_code_refresh_interval ~
+    Polling interval in milliseconds for the file-refresh timer.
+    Default: 1000
+
+                                       *g:claude_code_refresh_notify*
+g:claude_code_refresh_notify ~
+    Show a message when a buffer is reloaded after external changes.
+    Default: 1
+
+                                          *g:claude_code_float_width*
+g:claude_code_float_width ~
+    Popup window width as a fraction of the editor (0.0 – 1.0).
+    Default: 0.8
+
+                                         *g:claude_code_float_height*
+g:claude_code_float_height ~
+    Popup window height as a fraction of the editor (0.0 – 1.0).
+    Default: 0.8
+
+                                         *g:claude_code_float_border*
+g:claude_code_float_border ~
+    Border style for the popup window.  One of:
+      'rounded'  (default), 'single', 'double', 'solid', 'none'
+
+                                     *g:claude_code_variant_continue*
+g:claude_code_variant_continue ~
+    CLI flag for the Continue variant.
+    Default: '--continue'
+
+                                       *g:claude_code_variant_resume*
+g:claude_code_variant_resume ~
+    CLI flag for the Resume variant.
+    Default: '--resume'
+
+                                      *g:claude_code_variant_verbose*
+g:claude_code_variant_verbose ~
+    CLI flag for the Verbose variant.
+    Default: '--verbose'
+
+                                           *g:claude_code_map_toggle*
+g:claude_code_map_toggle ~
+    Key to toggle the Claude Code terminal (normal + terminal mode).
+    Default: '<C-,>'
+
+                                         *g:claude_code_map_continue*
+g:claude_code_map_continue ~
+    Key to toggle with --continue (normal mode).
+    Default: '<Leader>cC'
+
+                                          *g:claude_code_map_verbose*
+g:claude_code_map_verbose ~
+    Key to toggle with --verbose (normal mode).
+    Default: '<Leader>cV'
+
+==============================================================================
+6. KEYMAPS                                           *claude-code-keymaps*
+
+Default keymaps (when |g:claude_code_map_keys| is 1):
+
+  Normal mode:~
+    <C-,>        Toggle Claude Code terminal
+    <Leader>cC   Toggle with --continue
+    <Leader>cV   Toggle with --verbose
+
+  Terminal mode (inside the Claude Code window):~
+    <C-,>        Toggle (hide) Claude Code terminal
+    <C-h>        Move to the window on the left
+    <C-j>        Move to the window below
+    <C-k>        Move to the window above
+    <C-l>        Move to the window on the right
+
+To disable default keymaps and define your own: >
+    let g:claude_code_map_keys = 0
+
+    nnoremap <Leader>cc :ClaudeCode<CR>
+    tnoremap <Leader>cc <C-\><C-n>:ClaudeCode<CR>
+<
+
+==============================================================================
+7. WINDOW MODES                                     *claude-code-windows*
+
+The plugin supports five window layouts, controlled by
+|g:claude_code_position|:
+
+  botright   Horizontal split at the bottom of the screen (default).
+  topleft    Horizontal split at the top.
+  vertical   Vertical split on the right side.
+  float      Floating popup window (Vim 8.2+ with +popupwin).
+  tab        Dedicated tab page.
+
+The split size is controlled by |g:claude_code_split_ratio|.  The popup
+dimensions are controlled by |g:claude_code_float_width|,
+|g:claude_code_float_height|, and |g:claude_code_float_border|.
+
+If 'float' is selected but Vim lacks +popupwin, the plugin falls back
+to a 'botright' split.
+
+==============================================================================
+8. FILE REFRESH                                     *claude-code-refresh*
+
+When Claude Code modifies files on disk, the plugin automatically
+detects the changes and reloads affected buffers.  This is implemented
+via:
+
+- Lowering 'updatetime' while a Claude terminal is active (for faster
+  |CursorHold| events).
+- Autocommands on CursorHold, FocusGained, BufEnter, etc. that run
+  |:checktime|.
+- A background timer that polls for changes every
+  |g:claude_code_refresh_interval| milliseconds.
+
+The original 'updatetime' is restored when the last Claude terminal
+closes.
+
+==============================================================================
+9. GIT INTEGRATION                                     *claude-code-git*
+
+When |g:claude_code_use_git_root| is enabled (default), the plugin
+detects the git repository root and starts Claude Code in that
+directory.  This means Claude has full context of your project
+regardless of which subdirectory you opened Vim in.
+
+When |g:claude_code_multi_instance| is enabled (default), separate
+terminal instances are maintained for each git repository.  Switching
+between projects in the same Vim session gives each project its own
+Claude conversation.
+
+==============================================================================
+ vim:tw=78:ts=8:ft=help:norl:
