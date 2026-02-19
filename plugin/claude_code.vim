@@ -21,10 +21,13 @@ endif
 " Commands
 " ---------------------------------------------------------------------------
 
-command! -nargs=0 ClaudeCode          call claude_code#terminal#toggle()
-command! -nargs=0 ClaudeCodeContinue  call claude_code#terminal#toggle_variant('continue')
-command! -nargs=0 ClaudeCodeResume    call claude_code#terminal#toggle_variant('resume')
-command! -nargs=0 ClaudeCodeVerbose   call claude_code#terminal#toggle_variant('verbose')
+command! -nargs=? -complete=customlist,<SID>complete Claude
+      \ call claude_code#terminal#toggle(<f-args>)
+
+function! s:complete(ArgLead, CmdLine, CursorPos) abort
+  let l:subs = ['continue', 'resume', 'verbose']
+  return filter(copy(l:subs), 'v:val =~# "^" . a:ArgLead')
+endfunction
 
 " ---------------------------------------------------------------------------
 " Default keymaps
@@ -34,18 +37,18 @@ if claude_code#config#get('map_keys')
   " Normal mode toggle.
   let s:toggle_key = claude_code#config#get('map_toggle')
   if !empty(s:toggle_key)
-    execute 'nnoremap <silent> ' . s:toggle_key . ' :ClaudeCode<CR>'
-    execute 'tnoremap <silent> ' . s:toggle_key . ' <C-\><C-n>:ClaudeCode<CR>'
+    execute 'nnoremap <silent> ' . s:toggle_key . ' :Claude<CR>'
+    execute 'tnoremap <silent> ' . s:toggle_key . ' <C-\><C-n>:Claude<CR>'
   endif
 
   " Variant keymaps.
   let s:cont_key = claude_code#config#get('map_continue')
   if !empty(s:cont_key)
-    execute 'nnoremap <silent> ' . s:cont_key . ' :ClaudeCodeContinue<CR>'
+    execute 'nnoremap <silent> ' . s:cont_key . ' :Claude continue<CR>'
   endif
 
   let s:verbose_key = claude_code#config#get('map_verbose')
   if !empty(s:verbose_key)
-    execute 'nnoremap <silent> ' . s:verbose_key . ' :ClaudeCodeVerbose<CR>'
+    execute 'nnoremap <silent> ' . s:verbose_key . ' :Claude verbose<CR>'
   endif
 endif

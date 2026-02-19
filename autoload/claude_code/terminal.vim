@@ -17,10 +17,27 @@ let s:pending_variant = ''
 " Public API
 " ---------------------------------------------------------------------------
 
-" Toggle the Claude Code terminal.
+" Toggle the Claude Code terminal, optionally with a subcommand variant.
 " If a terminal for the current instance exists and is visible, hide it.
 " If it exists but is hidden, show it. Otherwise create a new one.
-function! claude_code#terminal#toggle() abort
+" When a variant name is given (e.g. 'continue'), the corresponding CLI
+" flag is appended on first creation only.
+function! claude_code#terminal#toggle(...) abort
+  let l:variant_name = a:0 ? a:1 : ''
+
+  " Resolve variant flag when a subcommand is provided.
+  if !empty(l:variant_name)
+    let l:flag = claude_code#config#get('variant_' . l:variant_name)
+    if type(l:flag) != v:t_string || empty(l:flag)
+      echohl ErrorMsg
+      echomsg 'claude-code: unknown subcommand "' . l:variant_name . '"'
+      echohl None
+      return
+    endif
+  else
+    let l:flag = ''
+  endif
+
   let l:id = s:get_instance_id()
   let l:bufnr = get(s:instances, l:id, -1)
 
@@ -31,35 +48,9 @@ function! claude_code#terminal#toggle() abort
       call s:show_existing(l:bufnr)
     endif
   else
-    call s:create_new(l:id)
-  endif
-endfunction
-
-" Toggle with a command variant (e.g. '--continue').
-" The variant flag is used for one creation cycle only; if the terminal
-" already exists, the flag is ignored and we just toggle visibility.
-function! claude_code#terminal#toggle_variant(variant_name) abort
-  let l:flag = claude_code#config#get('variant_' . a:variant_name)
-  if type(l:flag) != v:t_string || empty(l:flag)
-    echohl ErrorMsg
-    echomsg 'claude-code: unknown variant "' . a:variant_name . '"'
-    echohl None
-    return
-  endif
-
-  let l:id = s:get_instance_id()
-  let l:bufnr = get(s:instances, l:id, -1)
-
-  if l:bufnr > 0 && s:is_valid(l:bufnr)
-    " Existing terminal — just toggle visibility (variant not applicable).
-    if s:is_visible(l:bufnr)
-      call claude_code#window#close_buf_windows(l:bufnr)
-    else
-      call s:show_existing(l:bufnr)
+    if !empty(l:flag)
+      let s:pending_variant = l:flag
     endif
-  else
-    " New terminal — apply variant flag.
-    let s:pending_variant = l:flag
     call s:create_new(l:id)
     let s:pending_variant = ''
   endif

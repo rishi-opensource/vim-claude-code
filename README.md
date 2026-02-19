@@ -52,16 +52,16 @@ After installing, generate help tags:
 
 Open Vim and press `<C-,>` (Ctrl+comma) to launch Claude Code in a terminal split at the bottom of the screen. Press `<C-,>` again to hide it, and again to bring it back — the session persists.
 
-Run `:ClaudeCode` if you prefer using the command directly.
+Run `:Claude` if you prefer using the command directly. Subcommands are tab-completable — type `:Claude <Tab>` to see available options.
 
 ## Commands
 
 | Command | Description |
 |---|---|
-| `:ClaudeCode` | Toggle the Claude Code terminal |
-| `:ClaudeCodeContinue` | Toggle with `--continue` (resume last conversation) |
-| `:ClaudeCodeResume` | Toggle with `--resume` (interactive conversation picker) |
-| `:ClaudeCodeVerbose` | Toggle with `--verbose` (detailed logging) |
+| `:Claude` | Toggle the Claude Code terminal |
+| `:Claude continue` | Toggle with `--continue` (resume last conversation) |
+| `:Claude resume` | Toggle with `--resume` (interactive conversation picker) |
+| `:Claude verbose` | Toggle with `--verbose` (detailed logging) |
 
 ## Default Keymaps
 
@@ -88,8 +88,8 @@ To disable all default keymaps and define your own:
 ```vim
 let g:claude_code_map_keys = 0
 
-nnoremap <Leader>cc :ClaudeCode<CR>
-tnoremap <Leader>cc <C-\><C-n>:ClaudeCode<CR>
+nnoremap <Leader>cc :Claude<CR>
+tnoremap <Leader>cc <C-\><C-n>:Claude<CR>
 ```
 
 ## Window Modes
