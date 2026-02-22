@@ -10,6 +10,7 @@ let g:autoloaded_claude_code_refresh = 1
 " State
 let s:timer_id = -1
 let s:saved_updatetime = -1
+let s:saved_autoread = -1
 let s:active = 0
 
 " Start file-refresh monitoring.
@@ -25,7 +26,8 @@ function! claude_code#refresh#start() abort
   let s:saved_updatetime = &updatetime
   let &updatetime = 100
 
-  " Enable autoread so :checktime actually reloads silently.
+  " Save and enable autoread so :checktime actually reloads silently.
+  let s:saved_autoread = &autoread
   set autoread
 
   " Event-driven refresh.
@@ -67,6 +69,12 @@ function! claude_code#refresh#stop() abort
   if s:saved_updatetime >= 0
     let &updatetime = s:saved_updatetime
     let s:saved_updatetime = -1
+  endif
+
+  " Restore autoread.
+  if s:saved_autoread >= 0
+    let &autoread = s:saved_autoread
+    let s:saved_autoread = -1
   endif
 endfunction
 

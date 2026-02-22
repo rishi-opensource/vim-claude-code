@@ -60,22 +60,6 @@ endfunction
 " Internal helpers
 " ---------------------------------------------------------------------------
 
-" Translate user-friendly position names to Vim command modifiers.
-" Maps: bottom->botright, top->topleft, left->vertical topleft,
-"       right->vertical botright. Float and tab pass through as-is.
-let s:position_map = {
-      \ 'bottom': 'botright',
-      \ 'top':    'topleft',
-      \ 'left':   'vertical topleft',
-      \ 'right':  'vertical botright',
-      \ 'float':  'float',
-      \ 'tab':    'tab',
-      \ }
-
-function! s:resolve_position(pos) abort
-  return get(s:position_map, a:pos, a:pos)
-endfunction
-
 " Determine the instance identifier.
 " In multi-instance mode this is the git root (or cwd as fallback).
 " In single-instance mode it is the fixed string 'global'.
@@ -112,7 +96,7 @@ endfunction
 " Create a brand-new Claude Code terminal.
 function! s:create_new(instance_id) abort
   let l:cmd = s:build_command(a:instance_id)
-  let l:pos = s:resolve_position(claude_code#config#get('position'))
+  let l:pos = claude_code#window#resolve_position(claude_code#config#get('position'))
 
   if l:pos ==# 'float' && has('popupwin')
     let l:bufnr = s:create_float_terminal(l:cmd)
@@ -209,40 +193,7 @@ endfunction
 
 " Create terminal inside a floating popup.
 function! s:create_float_terminal(cmd) abort
-  let l:width_ratio  = claude_code#config#get('float_width')
-  let l:height_ratio = claude_code#config#get('float_height')
-
-  let l:width  = float2nr(round(&columns * l:width_ratio))
-  let l:height = float2nr(round(&lines   * l:height_ratio))
-  let l:width  = max([l:width,  20])
-  let l:height = max([l:height, 5])
-
-  let l:col = (&columns - l:width)  / 2
-  let l:row = (&lines   - l:height) / 2
-
-  " Border characters.
-  let l:border_name = claude_code#config#get('float_border')
-  let l:border_styles = {
-        \ 'rounded': ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
-        \ 'single':  ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
-        \ 'double':  ['═', '║', '═', '║', '╔', '╗', '╝', '╚'],
-        \ 'solid':   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        \ }
-  let l:borderchars = get(l:border_styles, l:border_name, l:border_styles['rounded'])
-
-  let l:popup_opts = {
-        \ 'minwidth':    l:width,
-        \ 'maxwidth':    l:width,
-        \ 'minheight':   l:height,
-        \ 'maxheight':   l:height,
-        \ 'line':        l:row + 1,
-        \ 'col':         l:col + 1,
-        \ 'zindex':      50,
-        \ 'title':       ' Claude Code ',
-        \ 'border':      [1, 1, 1, 1],
-        \ 'borderchars': l:borderchars,
-        \ 'hidden':      0,
-        \ }
+  let l:popup_opts = claude_code#window#build_float_opts(0)
 
   let l:bufnr = term_start([&shell, '-c', a:cmd], {
         \ 'hidden': 1,
@@ -278,7 +229,7 @@ endfunction
 
 " Re-show a hidden but valid terminal buffer.
 function! s:show_existing(bufnr) abort
-  let l:pos = s:resolve_position(claude_code#config#get('position'))
+  let l:pos = claude_code#window#resolve_position(claude_code#config#get('position'))
 
   if l:pos ==# 'float' && has('popupwin')
     call s:create_float_terminal_from_buf(a:bufnr)
@@ -312,38 +263,8 @@ endfunction
 
 " Show an existing buffer in a floating popup.
 function! s:create_float_terminal_from_buf(bufnr) abort
-  let l:width_ratio  = claude_code#config#get('float_width')
-  let l:height_ratio = claude_code#config#get('float_height')
-
-  let l:width  = float2nr(round(&columns * l:width_ratio))
-  let l:height = float2nr(round(&lines   * l:height_ratio))
-  let l:width  = max([l:width,  20])
-  let l:height = max([l:height, 5])
-
-  let l:col = (&columns - l:width)  / 2
-  let l:row = (&lines   - l:height) / 2
-
-  let l:border_name = claude_code#config#get('float_border')
-  let l:border_styles = {
-        \ 'rounded': ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
-        \ 'single':  ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
-        \ 'double':  ['═', '║', '═', '║', '╔', '╗', '╝', '╚'],
-        \ 'solid':   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-        \ }
-  let l:borderchars = get(l:border_styles, l:border_name, l:border_styles['rounded'])
-
-  call popup_create(a:bufnr, {
-        \ 'minwidth':    l:width,
-        \ 'maxwidth':    l:width,
-        \ 'minheight':   l:height,
-        \ 'maxheight':   l:height,
-        \ 'line':        l:row + 1,
-        \ 'col':         l:col + 1,
-        \ 'zindex':      50,
-        \ 'title':       ' Claude Code ',
-        \ 'border':      [1, 1, 1, 1],
-        \ 'borderchars': l:borderchars,
-        \ })
+  let l:popup_opts = claude_code#window#build_float_opts(a:bufnr)
+  call popup_create(a:bufnr, l:popup_opts)
 endfunction
 
 " Called when a Claude Code terminal buffer is wiped out.

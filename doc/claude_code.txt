@@ -98,12 +98,13 @@ g:claude_code_split_ratio ~
                                              *g:claude_code_position*
 g:claude_code_position ~
     Window layout.  One of:
-      'botright'  - horizontal split at the bottom (default)
-      'topleft'   - horizontal split at the top
-      'vertical'  - vertical split on the right
+      'bottom'    - horizontal split at the bottom (default)
+      'top'       - horizontal split at the top
+      'left'      - vertical split on the left
+      'right'     - vertical split on the right
       'float'     - popup window (requires +popupwin)
       'tab'       - dedicated tab
-    Default: 'botright'
+    Default: 'bottom'
 
                                          *g:claude_code_enter_insert*
 g:claude_code_enter_insert ~
@@ -222,12 +223,13 @@ To disable default keymaps and define your own: >
 ==============================================================================
 7. WINDOW MODES                                     *claude-code-windows*
 
-The plugin supports five window layouts, controlled by
+The plugin supports six window layouts, controlled by
 |g:claude_code_position|:
 
-  botright   Horizontal split at the bottom of the screen (default).
-  topleft    Horizontal split at the top.
-  vertical   Vertical split on the right side.
+  bottom     Horizontal split at the bottom of the screen (default).
+  top        Horizontal split at the top.
+  left       Vertical split on the left side.
+  right      Vertical split on the right side.
   float      Floating popup window (Vim 8.2+ with +popupwin).
   tab        Dedicated tab page.
 
@@ -236,7 +238,7 @@ dimensions are controlled by |g:claude_code_float_width|,
 |g:claude_code_float_height|, and |g:claude_code_float_border|.
 
 If 'float' is selected but Vim lacks +popupwin, the plugin falls back
-to a 'botright' split.
+to a 'bottom' split.
 
 ==============================================================================
 8. FILE REFRESH                                     *claude-code-refresh*
