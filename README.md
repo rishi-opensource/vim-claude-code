@@ -12,6 +12,42 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 - **Git-aware** — Starts Claude at the repository root; separate sessions per repo
 - **Configurable** — 20+ `g:` variables with buffer-local overrides
 
+## Demos
+
+### One-key toggle — open, hide, restore
+> `<C-\>` opens Claude in a split. Same key hides it. Session is never lost.
+
+![Toggle terminal](assets/01-toggle-terminal.gif)
+
+---
+
+### Instant bug fixing — `:Claude fix --apply`
+> Claude spots the SQL injection and resource leak, patches the file in place.
+
+![Fix bugs](assets/02-fix-bugs.gif)
+
+---
+
+### Visual selection → test generation
+> Select a function with `Shift-V`, run `:Claude test --edge-cases`. Nine tests written automatically.
+
+![Generate tests from selection](assets/03-visual-select-test.gif)
+
+---
+
+### Git workflow — commit message + PR description
+> `:Claude commit --conventional` reads your staged diff and writes a Conventional Commit. `:Claude pr` produces a full PR description with Summary, Changes, and Testing sections.
+
+![Git workflow](assets/04-git-workflow.gif)
+
+---
+
+### Command discovery with `<Tab>`
+> All 20 commands live under `:Claude`. Type `:Claude <Tab>` to browse, filter by typing, and run — without memorising anything.
+
+![Command discovery](assets/05-command-discovery.gif)
+
+
 ## Requirements
 
 - Vim 8.2+ compiled with `+terminal`
