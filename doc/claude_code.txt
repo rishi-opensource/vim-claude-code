@@ -18,6 +18,7 @@ CONTENTS                                                 *claude-code-contents*
       5.4  Architecture & Planning ........ |claude-code-arch-cmds|
       5.5  Workflow Commands .............. |claude-code-workflow-cmds|
       5.6  Meta Commands .................. |claude-code-meta-cmds|
+      5.7  Utility Commands ............... |claude-code-utility-cmds|
   6.  Keymaps ............................. |claude-code-keymaps|
   7.  Window Modes ........................ |claude-code-windows|
   8.  Configuration ....................... |claude-code-config|
@@ -202,6 +203,7 @@ file is used.
                                                              *:Claude-apply*
 :Claude apply
     Ask Claude to apply its last suggestion directly to the current file.
+    Prompts for confirmation (y/n) before sending — press n to cancel.
 
 ------------------------------------------------------------------------------
 5.6 Meta Commands                                      *claude-code-meta-cmds*
@@ -226,6 +228,32 @@ file is used.
         :Claude model haiku    →  claude-haiku-4-5-20251001
 
     Without an argument, opens an interactive picker.
+
+------------------------------------------------------------------------------
+5.7 Utility Commands                             *claude-code-utility-cmds*
+
+                                                          *:Claude-version*
+:Claude version
+    Display version information in a scratch window:
+
+    - Plugin version (g:claude_code_version)
+    - Vim version
+    - Claude CLI version (from `claude --version`)
+    - Whether +terminal support is compiled in
+
+                                                           *:Claude-doctor*
+:Claude doctor
+    Run a health check and display results in a scratch window.
+    Reports [OK] or [FAIL] for each requirement:
+
+    - Claude CLI found in $PATH
+    - Git found in $PATH
+    - Vim +terminal support available
+    - Vim version >= 8
+
+    Run this first when something is not working: >
+        :Claude doctor
+<
 
 ==============================================================================
 6. KEYMAPS                                              *claude-code-keymaps*
@@ -382,6 +410,22 @@ g:claude_code_float_border        Default: 'rounded'
 g:claude_code_model               Default: '' (Claude picks)
     Override the Claude model. Set via |:Claude-model| or directly: >
         let g:claude_code_model = 'claude-sonnet-4-6'
+<
+
+                                                      *g:claude_code_debug*
+g:claude_code_debug               Default: 0
+    Enable debug logging to the message area. When set to 1, logs all
+    dispatch calls, git operations, terminal launches, and refresh events: >
+        let g:claude_code_debug = 1
+<
+
+                                       *g:claude_code_terminal_start_delay*
+g:claude_code_terminal_start_delay  Default: 300
+    Maximum time in milliseconds to wait for a new terminal to reach
+    'running' state before sending a prompt. The plugin polls every 30ms
+    and returns as soon as the terminal is ready. Increase on slow machines
+    if commands fail to reach the terminal. >
+        let g:claude_code_terminal_start_delay = 600
 <
 
 ==============================================================================

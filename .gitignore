@@ -1,2 +1,12 @@
+# Claude Code artifacts
 CLAUDE.md
 .claude/
+
+# Vim generated files
+doc/tags
+*.swp
+*.swo
+*~
+
+# macOS
+.DS_Store

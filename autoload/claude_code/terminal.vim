@@ -30,9 +30,7 @@ function! claude_code#terminal#toggle(...) abort
   if !empty(l:variant_name)
     let l:flag = claude_code#config#get('variant_' . l:variant_name)
     if type(l:flag) != v:t_string || empty(l:flag)
-      echohl ErrorMsg
-      echomsg 'claude-code: unknown subcommand "' . l:variant_name . '"'
-      echohl None
+      call claude_code#util#error('claude-code: unknown subcommand "' . l:variant_name . '"')
       return
     endif
   else
