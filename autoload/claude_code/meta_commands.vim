@@ -1,5 +1,5 @@
 " autoload/claude_code/meta_commands.vim
-" Meta commands: chat, context, model
+" Meta commands: chat, context, model, version, doctor
 " Maintainer: Claude Code Vim Plugin
 " License: MIT
 
@@ -75,4 +75,79 @@ function! claude_code#meta_commands#model(flags) abort
   else
     echomsg 'claude-code: model → ' . l:model . ' (takes effect on next session)'
   endif
+endfunction
+
+" ---------------------------------------------------------------------------
+" :Claude version
+" ---------------------------------------------------------------------------
+
+function! claude_code#meta_commands#version() abort
+  let l:lines = [
+        \ '──────────────────────────────────',
+        \ ' vim-claude-code version info',
+        \ '──────────────────────────────────',
+        \ 'Plugin version : ' . get(g:, 'claude_code_version', 'unknown'),
+        \ 'Vim version    : ' . string(v:version / 100) . '.' . string(v:version % 100),
+        \ ]
+
+  if executable('claude')
+    let l:cli_ver = trim(system('claude --version 2>/dev/null'))
+    if v:shell_error || empty(l:cli_ver)
+      let l:cli_ver = '(could not determine)'
+    endif
+    call add(l:lines, 'Claude CLI      : ' . l:cli_ver)
+  else
+    call add(l:lines, 'Claude CLI      : NOT FOUND')
+  endif
+
+  call add(l:lines, 'Terminal support: ' . (has('terminal') ? 'yes' : 'no'))
+  call add(l:lines, '──────────────────────────────────')
+  call add(l:lines, 'Press q to close')
+
+  call claude_code#util#open_scratch('Claude: Version', l:lines)
+endfunction
+
+" ---------------------------------------------------------------------------
+" :Claude doctor
+" ---------------------------------------------------------------------------
+
+function! claude_code#meta_commands#doctor() abort
+  let l:lines = [
+        \ '──────────────────────────────────',
+        \ ' vim-claude-code health check',
+        \ '──────────────────────────────────',
+        \ ]
+
+  " Check: Claude CLI
+  if executable('claude')
+    call add(l:lines, '[OK]   Claude CLI found')
+  else
+    call add(l:lines, '[FAIL] Claude CLI not found — install from https://claude.ai/cli')
+  endif
+
+  " Check: Git
+  if executable('git')
+    call add(l:lines, '[OK]   Git found')
+  else
+    call add(l:lines, '[FAIL] Git not found — some features will not work')
+  endif
+
+  " Check: terminal support
+  if has('terminal')
+    call add(l:lines, '[OK]   Terminal support available')
+  else
+    call add(l:lines, '[FAIL] Terminal support not available — recompile Vim with +terminal')
+  endif
+
+  " Check: Vim version
+  if v:version >= 800
+    call add(l:lines, '[OK]   Vim version ' . string(v:version / 100) . '.' . string(v:version % 100))
+  else
+    call add(l:lines, '[FAIL] Vim ' . string(v:version / 100) . '.' . string(v:version % 100) . ' is too old — Vim 8+ required')
+  endif
+
+  call add(l:lines, '──────────────────────────────────')
+  call add(l:lines, 'Press q to close')
+
+  call claude_code#util#open_scratch('Claude: Doctor', l:lines)
 endfunction

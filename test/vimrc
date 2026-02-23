@@ -1,0 +1,13 @@
+" test/vimrc — minimal vimrc for running Vader tests
+set nocompatible
+
+" Point runtimepath to this plugin root
+let &rtp = expand('<sfile>:p:h:h') . ',' . &rtp
+
+" Load Vader from $VADER_PATH if set
+if !empty($VADER_PATH)
+  let &rtp .= ',' . $VADER_PATH
+endif
+
+" Source the plugin
+runtime plugin/claude_code.vim

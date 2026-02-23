@@ -24,6 +24,7 @@ let s:pending_variant = ''
 " flag is appended on first creation only.
 function! claude_code#terminal#toggle(...) abort
   let l:variant_name = a:0 ? a:1 : ''
+  call claude_code#util#debug('terminal#toggle variant=' . l:variant_name)
 
   " Resolve variant flag when a subcommand is provided.
   if !empty(l:variant_name)
@@ -95,6 +96,7 @@ endfunction
 
 " Create a brand-new Claude Code terminal.
 function! s:create_new(instance_id) abort
+  call claude_code#util#debug('terminal: creating new instance for ' . a:instance_id)
   let l:cmd = s:build_command(a:instance_id)
   let l:pos = claude_code#window#resolve_position(claude_code#config#get('position'))
 
@@ -107,9 +109,7 @@ function! s:create_new(instance_id) abort
   endif
 
   if l:bufnr <= 0
-    echohl ErrorMsg
-    echomsg 'claude-code: failed to create terminal'
-    echohl None
+    call claude_code#util#error('claude-code: failed to create terminal')
     return
   endif
 
@@ -123,6 +123,7 @@ function! s:create_new(instance_id) abort
   call claude_code#keymaps#setup_terminal(l:bufnr)
 
   " Start file-refresh monitoring.
+  call claude_code#util#debug('terminal: refresh started')
   call claude_code#refresh#start()
 
   " Autocommand to clean up when the terminal job exits.

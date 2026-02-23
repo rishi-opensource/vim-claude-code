@@ -50,6 +50,11 @@ endfunction
 
 " 15. :Claude apply
 function! claude_code#workflow_commands#apply(flags) abort
+  if !claude_code#util#confirm('Apply changes to file ' . expand('%:t') . '?')
+    echomsg 'vim-claude-code: apply cancelled'
+    return
+  endif
+  call claude_code#util#debug('workflow_commands: apply confirmed for ' . expand('%:p'))
   call claude_code#terminal_bridge#send(
         \ claude_code#util#file_context() .
         \ "\nTask: Apply the last code suggestion you made to this file. " .
