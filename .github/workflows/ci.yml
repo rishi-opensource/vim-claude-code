@@ -8,18 +8,18 @@ on:
 
 jobs:
   test:
-    name: Vim ${{ matrix.vim_version }}
+    name: Vim (${{ matrix.vim_version }})
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        vim_version: ['8.2', '9.0', '9.1']
+        vim_version: ['stable', 'nightly']
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install Vim ${{ matrix.vim_version }}
+      - name: Install Vim (${{ matrix.vim_version }})
         uses: rhysd/action-setup-vim@v1
         with:
           version: ${{ matrix.vim_version }}

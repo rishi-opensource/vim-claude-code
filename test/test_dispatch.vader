@@ -1,6 +1,9 @@
 " test/test_dispatch.vader
 " Vader tests for vim-claude-code v1.0.0
 " Run: vim -u test/vimrc -c 'Vader! test/test_dispatch.vader' -c 'qall!'
+"
+" NOTE: Vader Execute blocks run in command-line context.
+" Local variables (l:) are not available — use plain variable names or s:.
 
 " ---------------------------------------------------------------------------
 " Plugin constants
@@ -15,13 +18,13 @@ Execute (g:claude_code_version is set to 1.0.0):
 " ---------------------------------------------------------------------------
 
 Execute (util#error function exists):
-  Assert exists('*claude_code#util#error')
+  Assert exists('*claude_code#util#error'), 'claude_code#util#error not found'
 
 Execute (util#debug function exists):
-  Assert exists('*claude_code#util#debug')
+  Assert exists('*claude_code#util#debug'), 'claude_code#util#debug not found'
 
 Execute (util#confirm function exists):
-  Assert exists('*claude_code#util#confirm')
+  Assert exists('*claude_code#util#confirm'), 'claude_code#util#confirm not found'
 
 Execute (util#debug does not throw when debug=0):
   let g:claude_code_debug = 0
@@ -43,10 +46,10 @@ Execute (util#visual_selection returns empty string with no selection):
 " Util: file context
 " ---------------------------------------------------------------------------
 
-Execute (util#file_context returns a string containing "File:"):
-  let l:ctx = claude_code#util#file_context()
-  Assert type(l:ctx) == v:t_string
-  Assert l:ctx =~# 'File:'
+Execute (util#file_context returns a string containing File:):
+  let ctx = claude_code#util#file_context()
+  Assert type(ctx) == v:t_string, 'file_context did not return a string'
+  Assert ctx =~# 'File:', 'file_context missing File: prefix'
 
 " ---------------------------------------------------------------------------
 " Config
@@ -67,8 +70,8 @@ Execute (config#set / config#get round-trip):
 " ---------------------------------------------------------------------------
 
 Execute (git#root returns a string):
-  let l:root = claude_code#git#root()
-  Assert type(l:root) == v:t_string
+  let root = claude_code#git#root()
+  Assert type(root) == v:t_string, 'git#root did not return a string'
 
 Execute (git#clear_cache does not error):
   call claude_code#git#clear_cache()
@@ -78,17 +81,17 @@ Execute (git#clear_cache does not error):
 " ---------------------------------------------------------------------------
 
 Execute (terminal#toggle function exists):
-  Assert exists('*claude_code#terminal#toggle')
+  Assert exists('*claude_code#terminal#toggle'), 'terminal#toggle not found'
 
 Execute (terminal#on_close function exists):
-  Assert exists('*claude_code#terminal#on_close')
+  Assert exists('*claude_code#terminal#on_close'), 'terminal#on_close not found'
 
 " ---------------------------------------------------------------------------
 " Meta commands: version / doctor
 " ---------------------------------------------------------------------------
 
 Execute (meta_commands#version function exists):
-  Assert exists('*claude_code#meta_commands#version')
+  Assert exists('*claude_code#meta_commands#version'), 'meta_commands#version not found'
 
 Execute (meta_commands#doctor function exists):
-  Assert exists('*claude_code#meta_commands#doctor')
+  Assert exists('*claude_code#meta_commands#doctor'), 'meta_commands#doctor not found'
