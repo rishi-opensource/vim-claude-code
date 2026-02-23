@@ -278,6 +278,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_float_border` | `'rounded'` | Border style |
 | `g:claude_code_model` | `''` | Claude model override |
 | `g:claude_code_debug` | `0` | Enable debug logging to message area |
+| `g:claude_code_terminal_start_delay` | `300` | Delay (ms) before attaching to Claude terminal |
 
 Buffer-local `b:claude_code_*` overrides take precedence over `g:` variables.
 
