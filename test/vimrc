@@ -9,5 +9,36 @@ if !empty($VADER_PATH)
   let &rtp .= ',' . $VADER_PATH
 endif
 
-" Source the plugin
+" Source the plugin entry point
 runtime plugin/claude_code.vim
+
+" Force-source every autoload module so that exists('*func') checks in tests
+" return the correct result.
+"
+" Background: Vim's autoload system only sources a file the first time a
+" function from it is *called*. exists('*autoload#func') returns 0 for any
+" function whose file has not been sourced yet — even when the file exists on
+" disk. Because plugin/claude_code.vim only calls into autoload modules
+" conditionally (e.g. only when !has('terminal')), most autoload files are
+" never sourced during startup, so exists() checks in tests fail.
+"
+" Fix: clear each module's loaded-guard and re-runtime the file so Vim
+" sources it unconditionally and registers all its functions.
+let s:autoload_modules = [
+      \ 'util', 'config', 'git', 'terminal',
+      \ 'meta_commands', 'git_commands', 'workflow_commands',
+      \ 'arch_commands', 'commands', 'keymaps', 'refresh', 'window',
+      \ ]
+
+for s:mod in s:autoload_modules
+  let s:guard = 'g:autoloaded_claude_code_' . s:mod
+  if exists(s:guard)
+    unlet {s:guard}
+  endif
+  execute 'runtime autoload/claude_code/' . s:mod . '.vim'
+endfor
+
+" terminal_bridge.vim has no guard — source it directly
+runtime autoload/claude_code/terminal_bridge.vim
+
+unlet s:autoload_modules s:mod s:guard
