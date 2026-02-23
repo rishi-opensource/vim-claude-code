@@ -53,7 +53,7 @@ function! claude_code#terminal_bridge#send(prompt) abort
 
   if l:bnr < 0
     echoerr 'claude-code: no Claude terminal is running. '
-          \ . 'Open one first with :Claude or <C-,>'
+          \ . 'Open one first with :Claude or <C-\>'
     return
   endif
 

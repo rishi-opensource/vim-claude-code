@@ -4,7 +4,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 
 ## Features
 
-- **One-key toggle** — Open and close Claude Code with `<C-,>`
+- **One-key toggle** — Open and close Claude Code with `<C-\>`
 - **20 intelligent sub-commands** — Explain, fix, refactor, test, document, commit, review, and more
 - **Selection-aware** — Commands use visual selection when active, otherwise detect the current function
 - **Multiple window layouts** — Bottom split, top split, vertical split, floating popup, or dedicated tab
@@ -51,7 +51,7 @@ Copy `plugin/`, `autoload/`, and `doc/` into `~/.vim/`, then:
 
 ## Quick Start
 
-Press `<C-,>` to open Claude Code. Press it again to hide; again to restore. The session persists.
+Press `<C-\>` to open Claude Code. Press it again to hide; again to restore. The session persists.
 
 All sub-commands are tab-completable:
 ```
@@ -117,10 +117,10 @@ All sub-commands are tab-completable:
 
 | Mode | Key | Action |
 |---|---|---|
-| Normal | `<C-,>` | Toggle Claude Code terminal |
+| Normal | `<C-\>` | Toggle Claude Code terminal |
 | Normal | `<Leader>cC` | Toggle with `--continue` |
 | Normal | `<Leader>cV` | Toggle with `--verbose` |
-| Terminal | `<C-,>` | Hide Claude Code terminal |
+| Terminal | `<C-\>` | Hide Claude Code terminal |
 | Terminal | `<C-h/j/k/l>` | Navigate to adjacent window |
 
 ### Extended keymaps (`<Leader>c*`)
@@ -184,7 +184,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_multi_instance` | `1` | Separate session per git repo |
 | `g:claude_code_map_keys` | `1` | Register default toggle keymaps |
 | `g:claude_code_map_extended_keys` | `1` | Register `<Leader>c*` keymaps |
-| `g:claude_code_map_toggle` | `'<C-,>'` | Toggle key |
+| `g:claude_code_map_toggle` | `'<C-\>'` | Toggle key |
 | `g:claude_code_map_continue` | `'<Leader>cC'` | Continue key |
 | `g:claude_code_map_verbose` | `'<Leader>cV'` | Verbose key |
 | `g:claude_code_refresh_enable` | `1` | Auto-reload changed buffers |

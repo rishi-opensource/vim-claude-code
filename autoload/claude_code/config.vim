@@ -28,7 +28,7 @@ let s:defaults = {
       \ 'variant_continue': '--continue',
       \ 'variant_resume':   '--resume',
       \ 'variant_verbose':  '--verbose',
-      \ 'map_toggle':       '<C-,>',
+      \ 'map_toggle':       '<C-\>',
       \ 'map_continue':     '<Leader>cC',
       \ 'map_verbose':      '<Leader>cV',
       \ }

@@ -72,7 +72,7 @@ Generate help tags after installing: >
 ==============================================================================
 4. QUICK START                                        *claude-code-quickstart*
 
-Press `<C-,>` to open Claude Code in a split at the bottom of the screen.
+Press `<C-\>` to open Claude Code in a split at the bottom of the screen.
 Press it again to hide, and again to restore — the session persists.
 
 Or use the command directly: >
@@ -233,12 +233,12 @@ file is used.
 Default terminal keymaps (when |g:claude_code_map_keys| is 1):
 
   Normal mode: ~
-    <C-,>         Toggle Claude Code terminal
+    <C-\>         Toggle Claude Code terminal
     <Leader>cC    Toggle with --continue
     <Leader>cV    Toggle with --verbose
 
   Terminal mode (inside the Claude window): ~
-    <C-,>         Hide Claude Code terminal
+    <C-\>         Hide Claude Code terminal
     <C-h/j/k/l>   Navigate to adjacent window
 
 Extended keymaps (when g:claude_code_map_extended_keys is 1):
@@ -343,7 +343,7 @@ g:claude_code_map_extended_keys   Default: 1
     Register extended <Leader>c* keymaps for all sub-commands.
 
                                                *g:claude_code_map_toggle*
-g:claude_code_map_toggle          Default: '<C-,>'
+g:claude_code_map_toggle          Default: '<C-\>'
     Key to toggle the terminal (normal + terminal mode).
 
                                               *g:claude_code_map_continue*
