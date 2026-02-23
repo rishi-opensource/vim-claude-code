@@ -10,7 +10,7 @@ let g:autoloaded_claude_code_workflow_commands = 1
 
 " 11. :Claude rename
 function! claude_code#workflow_commands#rename(flags) abort
-  let l:code = s:code_target()
+  let l:code = claude_code#util#code_target()
   let l:ctx  = claude_code#util#file_context()
 
   call claude_code#terminal_bridge#send(
@@ -22,7 +22,7 @@ endfunction
 
 " 12. :Claude optimize
 function! claude_code#workflow_commands#optimize(flags) abort
-  let l:code = s:code_target()
+  let l:code = claude_code#util#code_target()
   let l:ctx  = claude_code#util#file_context()
 
   call claude_code#terminal_bridge#send(
@@ -48,7 +48,7 @@ function! claude_code#workflow_commands#debug(flags) abort
         \ "\n\nContext:\n```\n" . l:surround . "\n```\n")
 endfunction
 
-" 15. :Claude apply
+" 14. :Claude apply
 function! claude_code#workflow_commands#apply(flags) abort
   if !claude_code#util#confirm('Apply changes to file ' . expand('%:t') . '?')
     echomsg 'vim-claude-code: apply cancelled'
@@ -65,7 +65,4 @@ endfunction
 " Private helpers
 " ---------------------------------------------------------------------------
 
-function! s:code_target() abort
-  let l:sel = claude_code#util#visual_selection()
-  return empty(l:sel) ? claude_code#util#current_function() : l:sel
-endfunction
+" s:code_target() consolidated into claude_code#util#code_target() in util.vim

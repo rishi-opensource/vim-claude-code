@@ -1,14 +1,14 @@
 " plugin/claude_code.vim - Claude Code CLI integration for Vim
 " Maintainer: Claude Code Vim Plugin
 " License: MIT
-" Requires: Vim 8+ with +terminal
+" Requires: Vim 8.0+ with +terminal
 
 " ---------------------------------------------------------------------------
 " Version guard — must come first
 " ---------------------------------------------------------------------------
 
 if v:version < 800
-  echoerr "vim-claude-code requires Vim 8+"
+  echoerr "vim-claude-code requires Vim 8.0+"
   finish
 endif
 
@@ -27,7 +27,7 @@ let g:claude_code_version = "1.0.0"
 let g:claude_code_debug = get(g:, 'claude_code_debug', 0)
 
 if !has('terminal')
-  call claude_code#util#error('vim-claude-code: requires Vim 8+ compiled with +terminal support')
+  call claude_code#util#error('vim-claude-code: requires Vim 8.0+ compiled with +terminal support')
   finish
 endif
 

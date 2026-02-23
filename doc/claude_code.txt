@@ -31,7 +31,7 @@ CONTENTS                                                 *claude-code-contents*
 claude-code.vim integrates the Claude Code CLI directly into Vim. It provides:
 
 - A toggleable terminal running Claude Code inside your editor
-- 22 intelligent sub-commands for code explanation, fixing, refactoring,
+- 22 sub-commands for code explanation, fixing, refactoring,
   testing, documentation, git workflows, and more
 - Automatic file refresh when Claude modifies files on disk
 - Per-repository terminal instances with git root awareness

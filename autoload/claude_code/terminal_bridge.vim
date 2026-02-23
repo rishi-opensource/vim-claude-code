@@ -7,6 +7,12 @@
 "   - term_getstatus(bufnr) returns 'running' while alive
 "   - term_name is set to 'claude-code' in term_start() opts
 "
+
+if exists('g:autoloaded_claude_code_terminal_bridge')
+  finish
+endif
+let g:autoloaded_claude_code_terminal_bridge = 1
+
 " So we find the right buffer by scanning for b:claude_code_instance.
 
 " ─────────────────────────────────────────────────────────────────────────────

@@ -8,7 +8,7 @@ if exists('g:autoloaded_claude_code_meta_commands')
 endif
 let g:autoloaded_claude_code_meta_commands = 1
 
-" 14. :Claude chat
+" 15. :Claude chat
 function! claude_code#meta_commands#chat(flags) abort
   let l:msg = input('Claude> ')
   redraw
@@ -143,7 +143,7 @@ function! claude_code#meta_commands#doctor() abort
   if v:version >= 800
     call add(l:lines, '[OK]   Vim version ' . string(v:version / 100) . '.' . string(v:version % 100))
   else
-    call add(l:lines, '[FAIL] Vim ' . string(v:version / 100) . '.' . string(v:version % 100) . ' is too old — Vim 8+ required')
+    call add(l:lines, '[FAIL] Vim ' . string(v:version / 100) . '.' . string(v:version % 100) . ' is too old — Vim 8.0+ required')
   endif
 
   call add(l:lines, '──────────────────────────────────')
