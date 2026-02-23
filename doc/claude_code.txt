@@ -2,7 +2,7 @@
 
 Author:   Claude Code Vim Plugin
 License:  MIT
-Version:  2.0.0
+Version:  1.0.0
 
 ==============================================================================
 CONTENTS                                                 *claude-code-contents*
@@ -30,7 +30,7 @@ CONTENTS                                                 *claude-code-contents*
 claude-code.vim integrates the Claude Code CLI directly into Vim. It provides:
 
 - A toggleable terminal running Claude Code inside your editor
-- 17 intelligent sub-commands for code explanation, fixing, refactoring,
+- 22 intelligent sub-commands for code explanation, fixing, refactoring,
   testing, documentation, git workflows, and more
 - Automatic file refresh when Claude modifies files on disk
 - Per-repository terminal instances with git root awareness
@@ -40,10 +40,10 @@ All commands share the single `:Claude` entry point with tab-completion.
 ==============================================================================
 2. REQUIREMENTS                                      *claude-code-requirements*
 
-- Vim 8.2+ compiled with |+terminal| support
+- Vim 8+ compiled with |+terminal| support
 - Claude Code CLI installed and in $PATH
   See: https://docs.anthropic.com/en/docs/claude-code
-- Optional: Vim 8.2+ with |+popupwin| for floating window mode
+- Optional: Vim 8+ with |+popupwin| for floating window mode
 
 ==============================================================================
 3. INSTALLATION                                      *claude-code-installation*
