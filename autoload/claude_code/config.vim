@@ -28,7 +28,7 @@ let s:defaults = {
       \ 'variant_continue': '--continue',
       \ 'variant_resume':   '--resume',
       \ 'variant_verbose':  '--verbose',
-      \ 'map_toggle':       '<C-,>',
+      \ 'map_toggle':       '<C-\>',
       \ 'map_continue':     '<Leader>cC',
       \ 'map_verbose':      '<Leader>cV',
       \ }
@@ -48,4 +48,10 @@ endfunction
 " Return a copy of the full defaults dictionary (useful for documentation).
 function! claude_code#config#defaults() abort
   return copy(s:defaults)
+endfunction
+
+" Set a configuration value for the current session.
+" Writes to the g:claude_code_<key> variable that get() already reads.
+function! claude_code#config#set(key, value) abort
+  let g:{'claude_code_' . a:key} = a:value
 endfunction
