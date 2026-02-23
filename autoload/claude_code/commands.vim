@@ -10,7 +10,7 @@ let g:autoloaded_claude_code_commands = 1
 
 " 1. :Claude explain
 function! claude_code#commands#explain(flags) abort
-  let l:code = s:code_target()
+  let l:code = claude_code#util#code_target()
   let l:ctx  = claude_code#util#file_context()
 
   if a:flags =~# '--brief'
@@ -28,7 +28,7 @@ endfunction
 
 " 2. :Claude fix
 function! claude_code#commands#fix(flags) abort
-  let l:code = s:code_target()
+  let l:code = claude_code#util#code_target()
   let l:ctx  = claude_code#util#file_context()
   let l:safe = a:flags =~# '--safe'  ? 'Use minimal, safe changes only.' : ''
   let l:hint = a:flags =~# '--apply' ? 'Apply the fix directly without asking.'
@@ -42,7 +42,7 @@ endfunction
 
 " 3. :Claude refactor
 function! claude_code#commands#refactor(flags) abort
-  let l:code = s:code_target()
+  let l:code = claude_code#util#code_target()
   let l:ctx  = claude_code#util#file_context()
 
   let l:strategy = 'Refactor for clarity and structure.'
@@ -63,7 +63,7 @@ endfunction
 
 " 4. :Claude test
 function! claude_code#commands#test(flags) abort
-  let l:code = s:code_target()
+  let l:code = claude_code#util#code_target()
   let l:ctx  = claude_code#util#file_context()
 
   let l:fw = ''
@@ -89,7 +89,7 @@ endfunction
 
 " 5. :Claude doc
 function! claude_code#commands#doc(flags) abort
-  let l:code = s:code_target()
+  let l:code = claude_code#util#code_target()
   let l:ctx  = claude_code#util#file_context()
 
   if a:flags =~# '--markdown'
@@ -109,8 +109,4 @@ endfunction
 " Private helpers
 " ---------------------------------------------------------------------------
 
-" Return visual selection if active, otherwise current function body.
-function! s:code_target() abort
-  let l:sel = claude_code#util#visual_selection()
-  return empty(l:sel) ? claude_code#util#current_function() : l:sel
-endfunction
+" s:code_target() consolidated into claude_code#util#code_target() in util.vim

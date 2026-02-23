@@ -79,6 +79,12 @@ endfunction
 function! s:build_command(instance_id) abort
   let l:cmd = claude_code#config#get('command')
 
+  " Append --model when the user has configured one.
+  let l:model = claude_code#config#get('model')
+  if !empty(l:model)
+    let l:cmd .= ' --model ' . shellescape(l:model)
+  endif
+
   " Append pending variant flag.
   if !empty(s:pending_variant)
     let l:cmd .= ' ' . s:pending_variant

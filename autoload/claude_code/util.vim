@@ -99,3 +99,10 @@ function! claude_code#util#confirm(prompt) abort
   let l:ans = input(a:prompt . ' (y/n): ')
   return l:ans =~? '^y'
 endfunction
+
+" Return visual selection if active, otherwise current function body.
+" Shared helper used by commands.vim and workflow_commands.vim.
+function! claude_code#util#code_target() abort
+  let l:sel = claude_code#util#visual_selection()
+  return empty(l:sel) ? claude_code#util#current_function() : l:sel
+endfunction

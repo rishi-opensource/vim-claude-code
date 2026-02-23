@@ -38,7 +38,7 @@ for s:mod in s:autoload_modules
   execute 'runtime autoload/claude_code/' . s:mod . '.vim'
 endfor
 
-" terminal_bridge.vim has no guard — source it directly
+" terminal_bridge.vim now has a standard autoload guard — source it like the rest
 runtime autoload/claude_code/terminal_bridge.vim
 
 unlet s:autoload_modules s:mod s:guard

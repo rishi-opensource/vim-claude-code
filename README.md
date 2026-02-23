@@ -8,7 +8,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 ## Features
 
 - **One-key toggle** — Open and close Claude Code with `<C-\>`
-- **22 intelligent sub-commands** — Explain, fix, refactor, test, document, commit, review, and more
+- **22 sub-commands** — Explain, fix, refactor, test, document, commit, review, and more
 - **Selection-aware** — Commands use visual selection when active, otherwise detect the current function
 - **Multiple window layouts** — Bottom split, top split, vertical split, floating popup, or dedicated tab
 - **Automatic file refresh** — Buffers reload when Claude modifies files on disk
@@ -47,7 +47,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 ---
 
 ### Command discovery with `<Tab>`
-> All 22 commands live under `:Claude`. Type `:Claude <Tab>` to browse, filter by typing, and run — without memorising anything.
+> All 22 sub-commands live under `:Claude`. Type `:Claude <Tab>` to browse, filter by typing, and run — without memorising anything.
 
 ![Command discovery](assets/05-command-discovery.gif)
 
