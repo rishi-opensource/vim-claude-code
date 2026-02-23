@@ -8,13 +8,23 @@ if exists('g:autoloaded_claude_code_git_commands')
 endif
 let g:autoloaded_claude_code_git_commands = 1
 
+" Ensure git is available; show error and return 1 (caller should abort).
+function! s:require_git() abort
+  if !executable('git')
+    call claude_code#util#error('vim-claude-code: git is not installed or not on PATH')
+    return 1
+  endif
+  return 0
+endfunction
+
 " 6. :Claude commit
 function! claude_code#git_commands#commit(flags) abort
+  if s:require_git() | return | endif
+  call claude_code#util#debug('git_commands: commit flags=' . a:flags)
+
   let l:diff = system('git diff --staged 2>&1')
   if empty(trim(l:diff))
-    echohl WarningMsg
-    echomsg 'claude-code: no staged changes. Did you forget to git add?'
-    echohl None
+    call claude_code#util#error('claude-code: no staged changes. Did you forget to git add?')
     return
   endif
 
@@ -31,14 +41,15 @@ endfunction
 
 " 7. :Claude review
 function! claude_code#git_commands#review(flags) abort
+  if s:require_git() | return | endif
+  call claude_code#util#debug('git_commands: review flags=' . a:flags)
+
   let l:diff = system('git diff 2>&1')
   if empty(trim(l:diff))
     let l:diff = system('git diff HEAD 2>&1')
   endif
   if empty(trim(l:diff))
-    echohl WarningMsg
-    echomsg 'claude-code: no diff found to review.'
-    echohl None
+    call claude_code#util#error('claude-code: no diff found to review.')
     return
   endif
 
@@ -57,14 +68,15 @@ endfunction
 
 " 8. :Claude pr
 function! claude_code#git_commands#pr(flags) abort
+  if s:require_git() | return | endif
+  call claude_code#util#debug('git_commands: pr flags=' . a:flags)
+
   let l:diff = system('git diff origin/HEAD...HEAD 2>&1')
   if empty(trim(l:diff))
     let l:diff = system('git diff HEAD~1 2>&1')
   endif
   if empty(trim(l:diff))
-    echohl WarningMsg
-    echomsg 'claude-code: no diff found for PR description.'
-    echohl None
+    call claude_code#util#error('claude-code: no diff found for PR description.')
     return
   endif
 

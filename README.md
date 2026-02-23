@@ -1,15 +1,18 @@
 # vim-claude-code
 
+[![CI](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml/badge.svg)](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml)
+
 A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI directly into your editor. Run Claude Code in a managed terminal, send code context with a single keystroke, and get automatic file reloading when Claude edits your files — all without leaving Vim.
 
 ## Features
 
 - **One-key toggle** — Open and close Claude Code with `<C-\>`
-- **20 intelligent sub-commands** — Explain, fix, refactor, test, document, commit, review, and more
+- **22 intelligent sub-commands** — Explain, fix, refactor, test, document, commit, review, and more
 - **Selection-aware** — Commands use visual selection when active, otherwise detect the current function
 - **Multiple window layouts** — Bottom split, top split, vertical split, floating popup, or dedicated tab
 - **Automatic file refresh** — Buffers reload when Claude modifies files on disk
 - **Git-aware** — Starts Claude at the repository root; separate sessions per repo
+- **Health check** — `:Claude doctor` verifies your environment before you start
 - **Configurable** — 20+ `g:` variables with buffer-local overrides
 
 ## Demos
@@ -43,14 +46,14 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 ---
 
 ### Command discovery with `<Tab>`
-> All 20 commands live under `:Claude`. Type `:Claude <Tab>` to browse, filter by typing, and run — without memorising anything.
+> All 22 commands live under `:Claude`. Type `:Claude <Tab>` to browse, filter by typing, and run — without memorising anything.
 
 ![Command discovery](assets/05-command-discovery.gif)
 
 
 ## Requirements
 
-- Vim 8.2+ compiled with `+terminal`
+- Vim 8+ compiled with `+terminal`
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and in `$PATH`
 - Optional: `+popupwin` for floating window mode
 
@@ -92,6 +95,11 @@ Press `<C-\>` to open Claude Code. Press it again to hide; again to restore. The
 All sub-commands are tab-completable:
 ```
 :Claude <Tab>
+```
+
+Run a health check to verify your setup:
+```vim
+:Claude doctor
 ```
 
 ## Commands
@@ -137,7 +145,7 @@ All sub-commands are tab-completable:
 | `:Claude rename` | Suggest better variable/function names |
 | `:Claude optimize` | Optimize code for performance |
 | `:Claude debug` | Analyze error on current line |
-| `:Claude apply` | Apply Claude's last suggestion to the file |
+| `:Claude apply` | Apply Claude's last suggestion to the file (prompts for confirmation) |
 
 ### Meta
 
@@ -146,6 +154,13 @@ All sub-commands are tab-completable:
 | `:Claude chat` | Send a free-form message with current file context |
 | `:Claude context` | Preview what context will be sent to Claude |
 | `:Claude model [name]` | Switch model (`sonnet`, `opus`, `haiku`) |
+
+### Utility
+
+| Command | Description |
+|---|---|
+| `:Claude version` | Show plugin version, Vim version, Claude CLI version, and terminal support |
+| `:Claude doctor` | Health check: verifies Claude CLI, Git, terminal support, and Vim version |
 
 ## Keymaps
 
@@ -230,6 +245,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_float_height` | `0.8` | Popup height fraction |
 | `g:claude_code_float_border` | `'rounded'` | Border style |
 | `g:claude_code_model` | `''` | Claude model override |
+| `g:claude_code_debug` | `0` | Enable debug logging to message area |
 
 Buffer-local `b:claude_code_*` overrides take precedence over `g:` variables.
 
@@ -248,12 +264,18 @@ vim-claude-code/
 │       ├── git.vim               # Git root detection with caching
 │       ├── keymaps.vim           # Terminal-local keymaps
 │       ├── refresh.vim           # File change detection and reload
-│       ├── util.vim              # Shared helpers (selection, context)
+│       ├── util.vim              # Shared helpers (selection, context, error, debug)
 │       ├── commands.vim          # explain, fix, refactor, test, doc
 │       ├── git_commands.vim      # commit, review, pr
 │       ├── arch_commands.vim     # plan, analyze
 │       ├── workflow_commands.vim # rename, optimize, debug, apply
-│       └── meta_commands.vim     # chat, context, model
+│       └── meta_commands.vim     # chat, context, model, version, doctor
+├── test/
+│   ├── vimrc                     # Minimal vimrc for test runner
+│   └── test_dispatch.vader       # Vader test suite
+├── .github/
+│   └── workflows/
+│       └── ci.yml                # GitHub Actions CI (Vim 8 + Vim 9)
 └── doc/
     └── claude_code.txt           # :help documentation
 ```
@@ -266,17 +288,33 @@ vim-claude-code/
 
 ## Troubleshooting
 
+**Run the health check first:**
+```vim
+:Claude doctor
+```
+This reports `[OK]` / `[FAIL]` for each dependency and tells you exactly what to fix.
+
+---
+
 **E117: Unknown function** — Run `:helptags ALL` then restart Vim. Ensure the
 plugin directory is on your `runtimepath`.
 
 **Terminal does not open** — Verify `vim --version | grep +terminal`. The plugin
-requires Vim compiled with `+terminal`.
+requires Vim compiled with `+terminal`. Run `:Claude doctor` to confirm.
 
-**Claude not found** — Ensure `claude` is in `$PATH`: `which claude`.
+**Claude not found** — Ensure `claude` is in `$PATH`: `which claude`. Run
+`:Claude doctor` to confirm.
 
 **File changes not detected** — Check `g:claude_code_refresh_enable` is `1` and
 that `autoread` is not globally disabled in your vimrc.
 
+**Debug logging** — Enable verbose output to diagnose issues:
+```vim
+let g:claude_code_debug = 1
+```
+All internal events (dispatch, terminal launch, git calls, refresh) will be
+printed to the message area. Disable again with `let g:claude_code_debug = 0`.
+
 ## License
 
-MIT
+MIT — see [LICENSE](LICENSE).

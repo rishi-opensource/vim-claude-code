@@ -8,6 +8,29 @@ if exists('g:autoloaded_claude_code_util')
 endif
 let g:autoloaded_claude_code_util = 1
 
+" ---------------------------------------------------------------------------
+" Error / debug helpers
+" ---------------------------------------------------------------------------
+
+" Emit an error message using ErrorMsg highlight.
+" Use this everywhere instead of raw echoerr / echohl blocks.
+function! claude_code#util#error(msg) abort
+  echohl ErrorMsg
+  echomsg a:msg
+  echohl None
+endfunction
+
+" Emit a debug message when g:claude_code_debug is enabled.
+function! claude_code#util#debug(msg) abort
+  if get(g:, 'claude_code_debug', 0)
+    echomsg '[claude-code debug] ' . a:msg
+  endif
+endfunction
+
+" ---------------------------------------------------------------------------
+" Selection / context helpers
+" ---------------------------------------------------------------------------
+
 " Return visually selected text, or empty string if no selection active.
 function! claude_code#util#visual_selection() abort
   let [l:lnum1, l:col1] = getpos("'<")[1:2]
@@ -69,4 +92,10 @@ function! claude_code#util#open_scratch(title, lines) abort
   call setline(1, a:lines)
   setlocal nomodifiable
   nnoremap <buffer> <silent> q :close<CR>
+endfunction
+
+" Prompt the user with a yes/no question. Returns 1 for yes, 0 for no.
+function! claude_code#util#confirm(prompt) abort
+  let l:ans = input(a:prompt . ' (y/n): ')
+  return l:ans =~? '^y'
 endfunction

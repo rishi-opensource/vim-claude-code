@@ -1,17 +1,31 @@
 " plugin/claude_code.vim - Claude Code CLI integration for Vim
 " Maintainer: Claude Code Vim Plugin
 " License: MIT
-" Requires: Vim 8.2+ with +terminal
+" Requires: Vim 8+ with +terminal
+
+" ---------------------------------------------------------------------------
+" Version guard — must come first
+" ---------------------------------------------------------------------------
+
+if v:version < 800
+  echoerr "vim-claude-code requires Vim 8+"
+  finish
+endif
 
 if exists('g:loaded_claude_code')
   finish
 endif
 let g:loaded_claude_code = 1
 
+" ---------------------------------------------------------------------------
+" Plugin constants
+" ---------------------------------------------------------------------------
+
+let g:claude_code_version = "1.0.0"
+let g:claude_code_debug   = get(g:, 'claude_code_debug', 0)
+
 if !has('terminal')
-  echohl ErrorMsg
-  echomsg 'claude-code: requires Vim 8.2+ compiled with +terminal support'
-  echohl None
+  call claude_code#util#error('vim-claude-code: requires Vim 8+ compiled with +terminal support')
   finish
 endif
 
@@ -27,6 +41,7 @@ function! s:complete(ArgLead, CmdLine, CursorPos) abort
         \ 'plan', 'analyze',
         \ 'rename', 'optimize', 'debug', 'apply',
         \ 'chat', 'context', 'model',
+        \ 'version', 'doctor',
         \ ]
   return filter(copy(l:subs), 'v:val =~# "^" . a:ArgLead')
 endfunction
@@ -38,6 +53,8 @@ function! s:dispatch(args) abort
   let l:parts = split(a:args)
   let l:sub   = get(l:parts, 0, '')
   let l:flags = len(l:parts) > 1 ? join(l:parts[1:]) : ''
+
+  call claude_code#util#debug('dispatch: sub=' . l:sub . ' flags=' . l:flags)
 
   if l:sub ==# ''
     call claude_code#terminal#toggle()
@@ -81,10 +98,12 @@ function! s:dispatch(args) abort
     call claude_code#meta_commands#context(l:flags)
   elseif l:sub ==# 'model'
     call claude_code#meta_commands#model(l:flags)
+  elseif l:sub ==# 'version'
+    call claude_code#meta_commands#version()
+  elseif l:sub ==# 'doctor'
+    call claude_code#meta_commands#doctor()
   else
-    echohl ErrorMsg
-    echomsg 'claude-code: unknown sub-command "' . l:sub . '". Try :Claude <Tab>'
-    echohl None
+    call claude_code#util#error('vim-claude-code: unknown sub-command "' . l:sub . '". Try :Claude <Tab>')
   endif
 endfunction
 

@@ -1,0 +1,94 @@
+" test/test_dispatch.vader
+" Vader tests for vim-claude-code v1.0.0
+" Run: vim -u test/vimrc -c 'Vader! test/test_dispatch.vader' -c 'qall!'
+
+" ---------------------------------------------------------------------------
+" Plugin constants
+" ---------------------------------------------------------------------------
+
+Execute (g:claude_code_version is set to 1.0.0):
+  Assert exists('g:claude_code_version')
+  AssertEqual '1.0.0', g:claude_code_version
+
+" ---------------------------------------------------------------------------
+" Util: error / debug / confirm helpers
+" ---------------------------------------------------------------------------
+
+Execute (util#error function exists):
+  Assert exists('*claude_code#util#error')
+
+Execute (util#debug function exists):
+  Assert exists('*claude_code#util#debug')
+
+Execute (util#confirm function exists):
+  Assert exists('*claude_code#util#confirm')
+
+Execute (util#debug does not throw when debug=0):
+  let g:claude_code_debug = 0
+  call claude_code#util#debug('silent test')
+
+Execute (util#debug does not throw when debug=1):
+  let g:claude_code_debug = 1
+  call claude_code#util#debug('verbose test')
+  let g:claude_code_debug = 0
+
+" ---------------------------------------------------------------------------
+" Util: visual selection
+" ---------------------------------------------------------------------------
+
+Execute (util#visual_selection returns empty string with no selection):
+  AssertEqual '', claude_code#util#visual_selection()
+
+" ---------------------------------------------------------------------------
+" Util: file context
+" ---------------------------------------------------------------------------
+
+Execute (util#file_context returns a string containing "File:"):
+  let l:ctx = claude_code#util#file_context()
+  Assert type(l:ctx) == v:t_string
+  Assert l:ctx =~# 'File:'
+
+" ---------------------------------------------------------------------------
+" Config
+" ---------------------------------------------------------------------------
+
+Execute (config#get returns default command):
+  AssertEqual 'claude', claude_code#config#get('command')
+
+Execute (config#get returns default position):
+  AssertEqual 'bottom', claude_code#config#get('position')
+
+Execute (config#set / config#get round-trip):
+  call claude_code#config#set('_test_key', 'hello')
+  AssertEqual 'hello', claude_code#config#get('_test_key')
+
+" ---------------------------------------------------------------------------
+" Git root detection
+" ---------------------------------------------------------------------------
+
+Execute (git#root returns a string):
+  let l:root = claude_code#git#root()
+  Assert type(l:root) == v:t_string
+
+Execute (git#clear_cache does not error):
+  call claude_code#git#clear_cache()
+
+" ---------------------------------------------------------------------------
+" Terminal module presence
+" ---------------------------------------------------------------------------
+
+Execute (terminal#toggle function exists):
+  Assert exists('*claude_code#terminal#toggle')
+
+Execute (terminal#on_close function exists):
+  Assert exists('*claude_code#terminal#on_close')
+
+" ---------------------------------------------------------------------------
+" Meta commands: version / doctor
+" ---------------------------------------------------------------------------
+
+Execute (meta_commands#version function exists):
+  Assert exists('*claude_code#meta_commands#version')
+
+Execute (meta_commands#doctor function exists):
+  Assert exists('*claude_code#meta_commands#doctor')

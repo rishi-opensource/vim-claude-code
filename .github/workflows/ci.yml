@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    name: Vim ${{ matrix.vim_version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        vim_version: ['8.2', '9.0', '9.1']
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Install Vim ${{ matrix.vim_version }}
+        uses: rhysd/action-setup-vim@v1
+        with:
+          version: ${{ matrix.vim_version }}
+
+      - name: Clone Vader.vim
+        run: git clone --depth=1 https://github.com/junegunn/vader.vim.git /tmp/vader
+
+      - name: Run Vader tests
+        run: |
+          vim -u test/vimrc \
+              -c 'Vader! test/test_dispatch.vader' \
+              -c 'qall!' \
+              --not-a-term -e
+        env:
+          VADER_PATH: /tmp/vader
