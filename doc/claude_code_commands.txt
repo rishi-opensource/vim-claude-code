@@ -1,0 +1,228 @@
+*claude_code_commands.txt*  Extended commands for vim-claude-code
+
+Author:   rishi-opensource
+License:  MIT
+Version:  2.0.0
+
+==============================================================================
+CONTENTS                                        *claude-code-commands-contents*
+
+  1. Introduction ................. |claude-code-commands-intro|
+  2. Core Code Intelligence ....... |claude-code-core|
+  3. Git-Aware Commands ........... |claude-code-git|
+  4. Architecture & Planning ...... |claude-code-arch|
+  5. Productivity & Workflow ....... |claude-code-workflow|
+  6. Interactive / Chat ........... |claude-code-chat|
+  7. Transparency & Control ........ |claude-code-meta|
+  8. Default Keymaps .............. |claude-code-keymaps-ext|
+  9. Configuration ................ |claude-code-config-ext|
+
+==============================================================================
+1. INTRODUCTION                                   *claude-code-commands-intro*
+
+This file documents the extended sub-commands added on top of the base
+vim-claude-code plugin.  All commands share the same `:Claude` dispatcher,
+which now accepts 17 additional sub-commands.
+
+All commands open a Claude Code terminal session (or reuse the existing one)
+and inject a context-rich prompt.  Visual selections are automatically sent
+when available; otherwise the current function or file is used.
+
+Tab-completion is available: >
+    :Claude <Tab>
+<
+==============================================================================
+2. CORE CODE INTELLIGENCE                               *claude-code-core*
+
+                                                        *:Claude-explain*
+:Claude explain [--brief|--detailed]
+    Explain the visually selected code, or the function under the cursor.
+
+    Flags:
+      --brief     Short 2-3 sentence explanation.
+      --detailed  Thorough explanation including edge cases.
+
+                                                        *:Claude-fix*
+:Claude fix [--apply] [--safe]
+    Fix bugs or correctness issues in the selection or current function.
+
+    Flags:
+      --apply  Instruct Claude to apply changes directly.
+      --safe   Request minimal, conservative changes only.
+
+                                                        *:Claude-refactor*
+:Claude refactor [--extract|--simplify|--optimize|--rename]
+    Refactor the selected or current code.
+
+    Flags:
+      --extract   Extract reusable helpers.
+      --simplify  Reduce complexity.
+      --optimize  Improve performance.
+      --rename    Suggest better identifier names.
+
+                                                        *:Claude-test*
+:Claude test [--framework <name>] [--edge-cases]
+    Generate unit tests for the selection, current function, or file.
+
+    Flags:
+      --framework <name>  Specify test framework (jest, pytest, go-test, etc.)
+                          Auto-detected from filetype if omitted.
+      --edge-cases        Include boundary and edge-case tests.
+
+                                                        *:Claude-doc*
+:Claude doc [--inline|--markdown]
+    Generate documentation or docstrings.
+
+    Flags:
+      --inline    Inline comments and docstrings in the code.
+      --markdown  Produce standalone Markdown documentation.
+
+==============================================================================
+3. GIT-AWARE COMMANDS                                   *claude-code-git*
+
+                                                        *:Claude-commit*
+:Claude commit [--conventional] [--amend]
+    Generate a commit message from the staged diff (`git diff --staged`).
+
+    Flags:
+      --conventional  Use Conventional Commits format (feat:, fix:, etc.)
+      --amend         Note that this amends the previous commit.
+
+                                                        *:Claude-review*
+:Claude review [--strict] [--security]
+    Review the current git diff for bugs, performance, and style.
+
+    Flags:
+      --security  Focus exclusively on security vulnerabilities.
+      --strict    Exhaustive review covering all quality dimensions.
+
+                                                        *:Claude-pr*
+:Claude pr
+    Generate a pull request description from the branch diff vs origin/HEAD.
+    Output includes sections: Summary, Changes, Testing.
+
+==============================================================================
+4. ARCHITECTURE & PLANNING                              *claude-code-arch*
+
+                                                        *:Claude-plan*
+:Claude plan
+    Generate a phased implementation plan for the current file or feature.
+    Includes dependency notes and risk flags.
+
+                                                        *:Claude-analyze*
+:Claude analyze
+    Analyze the current file for cyclomatic complexity, performance
+    bottlenecks, and security concerns.  Report is formatted with Markdown
+    headers for easy reading.
+
+==============================================================================
+5. PRODUCTIVITY & WORKFLOW                              *claude-code-workflow*
+
+                                                        *:Claude-rename*
+:Claude rename
+    Suggest better variable and function names. Returns old → new mappings.
+
+                                                        *:Claude-optimize*
+:Claude optimize
+    Optimize the selected or current code for performance.  Each optimization
+    is accompanied by a brief explanation.
+
+                                                        *:Claude-debug*
+:Claude debug
+    Extract the error text on the current line and send it with surrounding
+    code context for root-cause analysis and a fix suggestion.
+
+                                                        *:Claude-apply*
+:Claude apply
+    Ask Claude to apply the last suggestion it made directly to the current
+    file.  Claude will write the updated file content.
+
+==============================================================================
+6. INTERACTIVE / CHAT                                   *claude-code-chat*
+
+                                                        *:Claude-chat*
+:Claude chat
+    Open an inline prompt (`Claude> `) and send a free-form message to Claude
+    with the current file context prepended.  Useful for quick questions
+    without leaving Normal mode.
+
+==============================================================================
+7. TRANSPARENCY & CONTROL                               *claude-code-meta*
+
+                                                        *:Claude-context*
+:Claude context
+    Open a scratch buffer showing what context would be sent to Claude:
+      - File path and filetype
+      - Git root directory
+      - Current selection (or note that function/file will be used)
+      - Active model
+
+                                                        *:Claude-model*
+:Claude model [name]
+    Switch the active Claude model for the session.
+
+    Shorthand aliases are accepted:
+      :Claude model sonnet   → claude-sonnet-4-6
+      :Claude model opus     → claude-opus-4-6
+      :Claude model haiku    → claude-haiku-4-5-20251001
+
+    Running `:Claude model` without an argument opens an interactive picker.
+
+==============================================================================
+8. DEFAULT KEYMAPS                                      *claude-code-keymaps-ext*
+
+Disable all extended keymaps: >
+    let g:claude_code_map_extended_keys = 0
+<
+Normal mode keymaps (all under <Leader>c):
+
+  Key         Command
+  ─────────────────────────────────
+  <Leader>ce  :Claude explain
+  <Leader>cf  :Claude fix
+  <Leader>cr  :Claude refactor
+  <Leader>ct  :Claude test
+  <Leader>cd  :Claude doc
+  <Leader>cG  :Claude commit
+  <Leader>cR  :Claude review
+  <Leader>cp  :Claude pr
+  <Leader>cP  :Claude plan
+  <Leader>ca  :Claude analyze
+  <Leader>cn  :Claude rename
+  <Leader>co  :Claude optimize
+  <Leader>cD  :Claude debug
+  <Leader>cA  :Claude apply
+  <Leader>cc  :Claude chat
+  <Leader>cx  :Claude context
+  <Leader>cm  :Claude model
+
+Visual mode keymaps (same prefix, operate on selection):
+
+  Key         Command
+  ─────────────────────────────────
+  <Leader>ce  :Claude explain
+  <Leader>cf  :Claude fix
+  <Leader>cr  :Claude refactor
+  <Leader>ct  :Claude test
+  <Leader>cd  :Claude doc
+  <Leader>cn  :Claude rename
+  <Leader>co  :Claude optimize
+
+==============================================================================
+9. CONFIGURATION                                        *claude-code-config-ext*
+
+New g: variables introduced by the extended commands:
+
+  Variable                         Default   Description
+  ──────────────────────────────────────────────────────────────────────────
+  g:claude_code_model              ''        Model override (empty = default)
+  g:claude_code_output_position    (same as  Where to open output windows:
+                                   position) 'bottom', 'top', 'left',
+                                             'right', 'float'
+  g:claude_code_map_extended_keys  1         Set 0 to disable all new keymaps
+
+All existing g:claude_code_* variables (position, float_width, etc.) are
+inherited automatically.
+
+==============================================================================
+vim:ft=help:tw=78:ts=8:noet:
