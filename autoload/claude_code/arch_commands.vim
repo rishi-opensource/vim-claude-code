@@ -1,42 +1,33 @@
 " autoload/claude_code/arch_commands.vim
-" Architecture / planning commands: plan, analyze
+" Architecture and planning commands: plan, analyze
+" Maintainer: Claude Code Vim Plugin
+" License: MIT
 
-function! s:file_context() abort
-  return printf("File: %s\nFiletype: %s\n", expand('%:p'), &filetype)
-endfunction
+if exists('g:autoloaded_claude_code_arch_commands')
+  finish
+endif
+let g:autoloaded_claude_code_arch_commands = 1
 
-function! s:send_to_terminal(prompt) abort
-  call claude_code#terminal_bridge#send(a:prompt)
-endfunction
-
-" ─────────────────────────────────────────────
 " 9. :Claude plan
-" ─────────────────────────────────────────────
-function! claude_code#arch_commands#plan(flags, ...) abort
-  let ctx      = s:file_context()
-  let content  = join(getline(1, '$'), "\n")
+function! claude_code#arch_commands#plan(flags) abort
+  let l:ctx     = claude_code#util#file_context()
+  let l:content = join(getline(1, '$'), "\n")
 
-  let prompt = ctx
-        \ . "\nTask: Generate a detailed implementation plan for this file/feature. "
-        \ . "Break it into phases, list dependencies, and flag potential risks."
-        \ . "\n\nCurrent file content:\n```\n" . content . "\n```\n"
-
-  call s:send_to_terminal(prompt)
+  call claude_code#terminal_bridge#send(
+        \ l:ctx .
+        \ "\nTask: Generate a detailed implementation plan. " .
+        \ "Break into phases, list dependencies, flag potential risks." .
+        \ "\n\nFile content:\n```\n" . l:content . "\n```\n")
 endfunction
 
-" ─────────────────────────────────────────────
 " 10. :Claude analyze
-" ─────────────────────────────────────────────
-function! claude_code#arch_commands#analyze(flags, ...) abort
-  let ctx     = s:file_context()
-  let content = join(getline(1, '$'), "\n")
+function! claude_code#arch_commands#analyze(flags) abort
+  let l:ctx     = claude_code#util#file_context()
+  let l:content = join(getline(1, '$'), "\n")
 
-  let focus = 'Analyze for: cyclomatic complexity, performance bottlenecks, and security concerns. '
-        \ . 'Format the report with sections: ## Complexity, ## Performance, ## Security.'
-
-  let prompt = ctx
-        \ . "\nTask: " . focus
-        \ . "\n\nFile content:\n```\n" . content . "\n```\n"
-
-  call s:send_to_terminal(prompt)
+  call claude_code#terminal_bridge#send(
+        \ l:ctx .
+        \ "\nTask: Analyze this file. Format with sections: " .
+        \ "## Complexity, ## Performance, ## Security." .
+        \ "\n\nFile content:\n```\n" . l:content . "\n```\n")
 endfunction

@@ -1,128 +1,78 @@
 " autoload/claude_code/meta_commands.vim
-" Transparency & control: context, model, chat
+" Meta commands: chat, context, model
+" Maintainer: Claude Code Vim Plugin
+" License: MIT
 
-" ─────────────────────────────────────────────
+if exists('g:autoloaded_claude_code_meta_commands')
+  finish
+endif
+let g:autoloaded_claude_code_meta_commands = 1
+
 " 14. :Claude chat
-" Opens a minimal interactive chat input prompt and sends to terminal.
-" ─────────────────────────────────────────────
-function! claude_code#meta_commands#chat(flags, ...) abort
-  let msg = input('Claude> ')
-  if empty(trim(msg))
-    echo ''
+function! claude_code#meta_commands#chat(flags) abort
+  let l:msg = input('Claude> ')
+  redraw
+  if empty(trim(l:msg))
     return
   endif
-  echo ''
-
-  let ctx = printf("File: %s | Filetype: %s\n", expand('%:p'), &filetype)
-  let prompt = ctx . msg
-
-  call s:send_to_terminal(prompt)
+  call claude_code#terminal_bridge#send(
+        \ claude_code#util#file_context() . l:msg)
 endfunction
 
-" ─────────────────────────────────────────────
 " 16. :Claude context
-" Displays what context will be sent: file path, git root, selection length, model.
-" ─────────────────────────────────────────────
-function! claude_code#meta_commands#context(flags, ...) abort
-  let file_path   = expand('%:p')
-  let git_root    = trim(system('git rev-parse --show-toplevel 2>/dev/null'))
-  let model       = claude_code#config#get('model', 'default (claude picks)')
-  let sel         = s:get_visual_selection()
-  let sel_info    = empty(sel)
+function! claude_code#meta_commands#context(flags) abort
+  let l:sel      = claude_code#util#visual_selection()
+  let l:sel_info = empty(l:sel)
         \ ? 'none (will use current function / file)'
-        \ : len(split(sel, "\n")) . ' lines selected'
+        \ : len(split(l:sel, "\n")) . ' lines selected'
+  let l:model    = claude_code#config#get('model', 'default')
+  let l:git_root = claude_code#git#root()
 
-  let lines = [
-        \ '─────────────────────────────────',
-        \ ' Claude Code Context Preview',
-        \ '─────────────────────────────────',
-        \ 'File path  : ' . file_path,
-        \ 'Filetype   : ' . &filetype,
-        \ 'Git root   : ' . (empty(git_root) ? 'not a git repo' : git_root),
-        \ 'Selection  : ' . sel_info,
-        \ 'Model      : ' . model,
-        \ '─────────────────────────────────',
+  call claude_code#util#open_scratch('Claude: Context Preview', [
+        \ '──────────────────────────────────',
+        \ ' Claude Code — Context Preview',
+        \ '──────────────────────────────────',
+        \ 'File     : ' . expand('%:p'),
+        \ 'Filetype : ' . &filetype,
+        \ 'Git root : ' . (empty(l:git_root) ? '(not a git repo)' : l:git_root),
+        \ 'Selection: ' . l:sel_info,
+        \ 'Model    : ' . l:model,
+        \ '──────────────────────────────────',
         \ 'Press q to close',
-        \ ]
-
-  call s:open_scratch('Claude: Context Preview', lines)
+        \ ])
 endfunction
 
-" ─────────────────────────────────────────────
 " 17. :Claude model
-" Switch the active Claude model.
-" Usage: :Claude model sonnet  |  :Claude model opus  |  :Claude model haiku
-" ─────────────────────────────────────────────
-function! claude_code#meta_commands#model(flags, ...) abort
-  " Parse model name from flags string or extra args
-  let model = trim(matchstr(a:flags, '\S\+'))
-  if empty(model) && a:0 > 0
-    let model = trim(a:1)
-  endif
+function! claude_code#meta_commands#model(flags) abort
+  let l:model = trim(matchstr(a:flags, '\S\+'))
 
-  if empty(model)
-    " Interactive picker
-    let choices = ['1. claude-opus-4-6   (most capable)', '2. claude-sonnet-4-6 (balanced, default)', '3. claude-haiku-4-5  (fastest)']
-    let choice  = inputlist(['Select model:'] + choices)
-    if choice == 1
-      let model = 'claude-opus-4-6'
-    elseif choice == 2
-      let model = 'claude-sonnet-4-6'
-    elseif choice == 3
-      let model = 'claude-haiku-4-5-20251001'
-    else
-      echo 'Cancelled.'
+  if empty(l:model)
+    let l:choice = inputlist([
+          \ 'Select model:',
+          \ '1. claude-opus-4-6    (most capable)',
+          \ '2. claude-sonnet-4-6  (balanced, default)',
+          \ '3. claude-haiku-4-5-20251001  (fastest)',
+          \ ])
+    let l:model = get({1: 'claude-opus-4-6', 2: 'claude-sonnet-4-6',
+          \            3: 'claude-haiku-4-5-20251001'}, l:choice, '')
+    if empty(l:model)
       return
     endif
   else
-    " Accept shorthand aliases
-    let aliases = {
+    let l:model = get({
           \ 'opus':   'claude-opus-4-6',
           \ 'sonnet': 'claude-sonnet-4-6',
           \ 'haiku':  'claude-haiku-4-5-20251001',
-          \ }
-    let model = get(aliases, tolower(model), model)
+          \ }, tolower(l:model), l:model)
   endif
 
-  call claude_code#config#set('model', model)
+  call claude_code#config#set('model', l:model)
 
-  " Notify the terminal if running
-  let term_buf = claude_code#terminal_bridge#get_buf()
-  if term_buf >= 0
-    call term_sendkeys(term_buf, '/model ' . model . "\n")
+  let l:bnr = claude_code#terminal_bridge#get_buf()
+  if l:bnr >= 0
+    call term_sendkeys(l:bnr, '/model ' . l:model . "\n")
+    echomsg 'claude-code: model → ' . l:model . ' (terminal notified)'
+  else
+    echomsg 'claude-code: model → ' . l:model . ' (takes effect on next session)'
   endif
-
-  echo 'claude-code: model set to ' . model
-        \ . (term_buf >= 0 ? ' (notified terminal)' : ' (takes effect on next session)')
-endfunction
-
-" ─────────────────────────────────────────────
-" Helpers (duplicated here to avoid cross-autoload coupling)
-" ─────────────────────────────────────────────
-function! s:get_visual_selection() abort
-  let [lnum1, col1] = getpos("'<")[1:2]
-  let [lnum2, col2] = getpos("'>")[1:2]
-  if lnum1 == 0 || lnum1 > lnum2
-    return ''
-  endif
-  let lines = getline(lnum1, lnum2)
-  if empty(lines) | return '' | endif
-  let lines[-1] = lines[-1][: col2 - (&selection ==# 'inclusive' ? 1 : 2)]
-  let lines[0]  = lines[0][col1 - 1:]
-  return join(lines, "\n")
-endfunction
-
-function! s:open_scratch(title, lines) abort
-  botright split
-  enew
-  setlocal buftype=nofile bufhidden=wipe noswapfile nobuflisted
-  setlocal filetype=text
-  silent! execute 'file ' . escape(a:title, ' ')
-  call setline(1, a:lines)
-  setlocal nomodifiable
-  nnoremap <buffer> q :close<CR>
-endfunction
-
-function! s:send_to_terminal(prompt) abort
-  call claude_code#terminal_bridge#send(a:prompt)
 endfunction

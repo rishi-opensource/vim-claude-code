@@ -1,115 +1,66 @@
 " autoload/claude_code/workflow_commands.vim
 " Productivity commands: rename, optimize, debug, apply
+" Maintainer: Claude Code Vim Plugin
+" License: MIT
 
-function! s:get_visual_selection() abort
-  let [lnum1, col1] = getpos("'<")[1:2]
-  let [lnum2, col2] = getpos("'>")[1:2]
-  if lnum1 == 0 || lnum1 > lnum2
-    return ''
-  endif
-  let lines = getline(lnum1, lnum2)
-  if empty(lines)
-    return ''
-  endif
-  let lines[-1] = lines[-1][: col2 - (&selection ==# 'inclusive' ? 1 : 2)]
-  let lines[0]  = lines[0][col1 - 1:]
-  return join(lines, "\n")
-endfunction
+if exists('g:autoloaded_claude_code_workflow_commands')
+  finish
+endif
+let g:autoloaded_claude_code_workflow_commands = 1
 
-function! s:get_current_function() abort
-  let start = line('.')
-  let func_start = start
-  while func_start > 1
-    let ln = getline(func_start)
-    if ln =~# '\v(function|def |func |fn |sub |method|class )'
-      break
-    endif
-    let func_start -= 1
-  endwhile
-  let func_end = func_start
-  let max_end  = min([line('$'), func_start + 200])
-  while func_end < max_end
-    let func_end += 1
-    if func_end > func_start + 2 && getline(func_end) =~# '\v^(function|def |func |fn |class )'
-      let func_end -= 1
-      break
-    endif
-  endwhile
-  let lines = getline(func_start, func_end)
-  return empty(lines) ? join(getline(1, '$'), "\n") : join(lines, "\n")
-endfunction
-
-function! s:file_context() abort
-  return printf("File: %s\nFiletype: %s\n", expand('%:p'), &filetype)
-endfunction
-
-function! s:send_to_terminal(prompt) abort
-  call claude_code#terminal_bridge#send(a:prompt)
-endfunction
-
-" ─────────────────────────────────────────────
 " 11. :Claude rename
-" ─────────────────────────────────────────────
-function! claude_code#workflow_commands#rename(flags, ...) abort
-  let sel  = s:get_visual_selection()
-  let code = empty(sel) ? s:get_current_function() : sel
-  let ctx  = s:file_context()
+function! claude_code#workflow_commands#rename(flags) abort
+  let l:code = s:code_target()
+  let l:ctx  = claude_code#util#file_context()
 
-  let prompt = ctx
-        \ . "\nTask: Suggest better, more descriptive and idiomatic names for the variables "
-        \ . "and functions in the following code. List old → new mappings."
-        \ . "\n\n```\n" . code . "\n```\n"
-
-  call s:send_to_terminal(prompt)
+  call claude_code#terminal_bridge#send(
+        \ l:ctx .
+        \ "\nTask: Suggest better, more descriptive and idiomatic names. " .
+        \ "List old → new mappings." .
+        \ "\n\n```\n" . l:code . "\n```\n")
 endfunction
 
-" ─────────────────────────────────────────────
 " 12. :Claude optimize
-" ─────────────────────────────────────────────
-function! claude_code#workflow_commands#optimize(flags, ...) abort
-  let sel  = s:get_visual_selection()
-  let code = empty(sel) ? s:get_current_function() : sel
-  let ctx  = s:file_context()
+function! claude_code#workflow_commands#optimize(flags) abort
+  let l:code = s:code_target()
+  let l:ctx  = claude_code#util#file_context()
 
-  let prompt = ctx
-        \ . "\nTask: Optimize the following code for performance. "
-        \ . "Explain each optimization with a brief comment."
-        \ . "\n\n```\n" . code . "\n```\n"
-
-  call s:send_to_terminal(prompt)
+  call claude_code#terminal_bridge#send(
+        \ l:ctx .
+        \ "\nTask: Optimize for performance. " .
+        \ "Explain each optimization with a brief comment." .
+        \ "\n\n```\n" . l:code . "\n```\n")
 endfunction
 
-" ─────────────────────────────────────────────
 " 13. :Claude debug
-" Extracts the error text under/near the cursor and sends it with context.
-" ─────────────────────────────────────────────
-function! claude_code#workflow_commands#debug(flags, ...) abort
-  let ctx        = s:file_context()
-  let error_line = getline('.')
-  let cursor_ln  = line('.')
+function! claude_code#workflow_commands#debug(flags) abort
+  let l:ctx       = claude_code#util#file_context()
+  let l:lnum      = line('.')
+  let l:error_ln  = getline(l:lnum)
+  let l:ctx_start = max([1, l:lnum - 10])
+  let l:ctx_end   = min([line('$'), l:lnum + 10])
+  let l:surround  = join(getline(l:ctx_start, l:ctx_end), "\n")
 
-  " Grab surrounding 10 lines for context
-  let start_ctx = max([1, cursor_ln - 10])
-  let end_ctx   = min([line('$'), cursor_ln + 10])
-  let surrounding = join(getline(start_ctx, end_ctx), "\n")
-
-  let prompt = ctx
-        \ . "\nTask: Analyze this error and explain the root cause and fix."
-        \ . "\n\nError line (line " . cursor_ln . "):\n  " . trim(error_line)
-        \ . "\n\nSurrounding code context:\n```\n" . surrounding . "\n```\n"
-
-  call s:send_to_terminal(prompt)
+  call claude_code#terminal_bridge#send(
+        \ l:ctx .
+        \ "\nTask: Analyze this error and explain the root cause and fix." .
+        \ "\n\nError line " . l:lnum . ":\n  " . trim(l:error_ln) .
+        \ "\n\nContext:\n```\n" . l:surround . "\n```\n")
 endfunction
 
-" ─────────────────────────────────────────────
 " 15. :Claude apply
-" Applies the last suggestion Claude made as a patch to the current buffer.
-" ─────────────────────────────────────────────
-function! claude_code#workflow_commands#apply(flags, ...) abort
-  let ctx = s:file_context()
-  let prompt = ctx
-        \ . "\nTask: Apply the last code suggestion you made to the file above. "
-        \ . "Write the complete updated file content, then use write_file to save it."
+function! claude_code#workflow_commands#apply(flags) abort
+  call claude_code#terminal_bridge#send(
+        \ claude_code#util#file_context() .
+        \ "\nTask: Apply the last code suggestion you made to this file. " .
+        \ "Write the complete updated file content and save it.")
+endfunction
 
-  call s:send_to_terminal(prompt)
+" ---------------------------------------------------------------------------
+" Private helpers
+" ---------------------------------------------------------------------------
+
+function! s:code_target() abort
+  let l:sel = claude_code#util#visual_selection()
+  return empty(l:sel) ? claude_code#util#current_function() : l:sel
 endfunction
