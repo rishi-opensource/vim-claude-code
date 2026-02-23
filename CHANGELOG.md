@@ -33,8 +33,8 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 - **Vader test suite** — `test/test_dispatch.vader` covers: plugin constants,
   util helpers, visual selection, config round-trips, git root detection, and
   terminal/meta command presence.
-- **GitHub Actions CI** — `.github/workflows/ci.yml` runs tests on Vim 8.2,
-  9.0, and 9.1.
+- **GitHub Actions CI** — `.github/workflows/ci.yml` runs tests on Vim stable
+  and nightly.
 - **`CHANGELOG.md`** — This file.
 - **`SECURITY.md`** — Security policy: local-only execution model, no remote
   calls from Vim, local-only git operations.
