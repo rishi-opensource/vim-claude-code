@@ -24,7 +24,11 @@ function! claude_code#refresh#start() abort
 
   " Save and lower updatetime.
   let s:saved_updatetime = &updatetime
-  let &updatetime = 100
+  " Lower updatetime to trigger CursorHold more frequently while Claude
+  " is active. 500ms is a reasonable balance — fast enough to catch file
+  " changes quickly, but not so aggressive that it interferes with other
+  " plugins (GitGutter, ALE, LSP clients) or floods swap file writes.
+  let &updatetime = 500
 
   " Save and enable autoread so :checktime actually reloads silently.
   let s:saved_autoread = &autoread

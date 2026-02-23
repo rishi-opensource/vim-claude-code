@@ -22,7 +22,9 @@ let g:loaded_claude_code = 1
 " ---------------------------------------------------------------------------
 
 let g:claude_code_version = "1.0.0"
-let g:claude_code_debug   = get(g:, 'claude_code_debug', 0)
+" Initialise debug flag from user config (defaults to 0 via config.vim).
+" We use get() here so it works even before config.vim is autoloaded.
+let g:claude_code_debug = get(g:, 'claude_code_debug', 0)
 
 if !has('terminal')
   call claude_code#util#error('vim-claude-code: requires Vim 8+ compiled with +terminal support')
@@ -129,7 +131,7 @@ if claude_code#config#get('map_keys')
   endif
 endif
 
-if get(g:, 'claude_code_map_extended_keys', 1)
+if claude_code#config#get('map_extended_keys')
   " Normal mode
   nnoremap <silent> <Leader>ce  :Claude explain<CR>
   nnoremap <silent> <Leader>cf  :Claude fix<CR>

@@ -29,7 +29,7 @@ function! claude_code#keymaps#setup_terminal(bufnr) abort
     augroup ClaudeCodeTermFocus
       execute 'autocmd! * <buffer=' . a:bufnr . '>'
       execute 'autocmd BufEnter,WinEnter <buffer=' . a:bufnr . '>'
-            \ . ' if mode() !=# "t" | silent! normal! i | endif'
+            \ . ' if mode() !~# ''[tRiI]'' && mode() !=# ''c'' | silent! normal! i | endif'
     augroup END
   endif
 endfunction

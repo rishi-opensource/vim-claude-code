@@ -47,13 +47,27 @@ function! claude_code#terminal_bridge#send(prompt) abort
   if l:bnr < 0
     " Open a terminal via the base plugin (toggle with no variant).
     call claude_code#terminal#toggle()
-    sleep 300m
+
+    " Wait for the terminal job to reach 'running' state using a retry loop
+    " instead of a blind sleep. Total wait is capped at g:claude_code_terminal_start_delay
+    " milliseconds (default 300ms), checking every 30ms so we return as soon
+    " as the terminal is ready rather than always waiting the full duration.
+    let l:delay   = claude_code#config#get('terminal_start_delay')
+    let l:waited  = 0
+    while l:waited < l:delay
+      let l:bnr = claude_code#terminal_bridge#get_buf()
+      if l:bnr >= 0
+        break
+      endif
+      sleep 30m
+      let l:waited += 30
+    endwhile
     let l:bnr = claude_code#terminal_bridge#get_buf()
   endif
 
   if l:bnr < 0
-    echoerr 'claude-code: no Claude terminal is running. '
-          \ . 'Open one first with :Claude or <C-\>'
+    call claude_code#util#error('claude-code: no Claude terminal is running. '
+          \ . 'Open one first with :Claude or <C-\>')
     return
   endif
 

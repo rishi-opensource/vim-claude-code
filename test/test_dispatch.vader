@@ -52,7 +52,7 @@ Execute (util#file_context returns a string containing File:):
   Assert ctx =~# 'File:', 'file_context missing File: prefix'
 
 " ---------------------------------------------------------------------------
-" Config
+" Config: defaults and round-trip
 " ---------------------------------------------------------------------------
 
 Execute (config#get returns default command):
@@ -61,9 +61,29 @@ Execute (config#get returns default command):
 Execute (config#get returns default position):
   AssertEqual 'bottom', claude_code#config#get('position')
 
+Execute (config#get returns default debug = 0):
+  AssertEqual 0, claude_code#config#get('debug')
+
+Execute (config#get returns default map_extended_keys = 1):
+  AssertEqual 1, claude_code#config#get('map_extended_keys')
+
+Execute (config#get returns default terminal_start_delay = 300):
+  AssertEqual 300, claude_code#config#get('terminal_start_delay')
+
 Execute (config#set / config#get round-trip):
   call claude_code#config#set('_test_key', 'hello')
   AssertEqual 'hello', claude_code#config#get('_test_key')
+
+" ---------------------------------------------------------------------------
+" Config: buffer-local override takes precedence
+" ---------------------------------------------------------------------------
+
+Execute (buffer-local b: override takes precedence over g:):
+  let g:claude_code_position = 'top'
+  let b:claude_code_position = 'left'
+  AssertEqual 'left', claude_code#config#get('position')
+  unlet g:claude_code_position
+  unlet b:claude_code_position
 
 " ---------------------------------------------------------------------------
 " Git root detection
@@ -75,6 +95,19 @@ Execute (git#root returns a string):
 
 Execute (git#clear_cache does not error):
   call claude_code#git#clear_cache()
+
+" ---------------------------------------------------------------------------
+" Window: position resolution
+" ---------------------------------------------------------------------------
+
+Execute (window#resolve_position maps bottom to botright):
+  AssertEqual 'botright', claude_code#window#resolve_position('bottom')
+
+Execute (window#resolve_position maps right to vertical botright):
+  AssertEqual 'vertical botright', claude_code#window#resolve_position('right')
+
+Execute (window#resolve_position passes through unknown values):
+  AssertEqual 'myval', claude_code#window#resolve_position('myval')
 
 " ---------------------------------------------------------------------------
 " Terminal module presence
