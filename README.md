@@ -1,6 +1,7 @@
 # vim-claude-code
 
 [![CI](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml/badge.svg)](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml)
+[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
 
 A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI directly into your editor. Run Claude Code in a managed terminal, send code context with a single keystroke, and get automatic file reloading when Claude edits your files — all without leaving Vim.
 
@@ -59,33 +60,64 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 
 ## Installation
 
+> **Stable release — v1.0.0**
+> Pin to the latest stable release using the examples below, or omit the tag
+> to always track the latest commit on `main`.
+
 ### [vim-plug](https://github.com/junegunn/vim-plug)
 ```vim
+" Always track latest
 Plug 'rishi-opensource/vim-claude-code'
+
+" Pin to stable release
+Plug 'rishi-opensource/vim-claude-code', { 'tag': 'v1.0.0' }
 ```
 
 ### [Vundle](https://github.com/VundleVim/Vundle.vim)
 ```vim
 Plugin 'rishi-opensource/vim-claude-code'
 ```
+> Vundle does not support tag pinning. To pin manually after install:
+> ```sh
+> cd ~/.vim/bundle/vim-claude-code && git checkout v1.0.0
+> ```
 
 ### [pathogen](https://github.com/tpope/vim-pathogen)
 ```sh
 cd ~/.vim/bundle
-git clone https://github.com/rishi-opensource/vim-claude-code.git
+git clone --branch v1.0.0 https://github.com/rishi-opensource/vim-claude-code.git
 ```
 
 ### Native packages (Vim 8+)
 ```sh
 mkdir -p ~/.vim/pack/plugins/start
 cd ~/.vim/pack/plugins/start
-git clone https://github.com/rishi-opensource/vim-claude-code.git
+git clone --branch v1.0.0 https://github.com/rishi-opensource/vim-claude-code.git
 ```
 
 ### Manual
-Copy `plugin/`, `autoload/`, and `doc/` into `~/.vim/`, then:
+Copy `plugin/`, `autoload/`, and `doc/` into `~/.vim/`, then run inside Vim:
 ```vim
 :helptags ALL
+```
+> Run `:helptags ALL` whenever you install or update the plugin to ensure
+> `:help claude-code` works correctly.
+
+## Releases
+
+Stable releases are published as annotated git tags on GitHub.
+
+| Release | Date | Notes |
+|---|---|---|
+| [v1.0.0](https://github.com/rishi-opensource/vim-claude-code/releases/tag/v1.0.0) | 2026-02-24 | First stable release |
+
+See [CHANGELOG.md](CHANGELOG.md) for full details.
+
+To upgrade to a specific release with pathogen or native packages:
+```sh
+cd ~/.vim/bundle/vim-claude-code   # or your pack path
+git fetch --tags
+git checkout v1.0.0
 ```
 
 ## Quick Start
@@ -314,6 +346,20 @@ let g:claude_code_debug = 1
 ```
 All internal events (dispatch, terminal launch, git calls, refresh) will be
 printed to the message area. Disable again with `let g:claude_code_debug = 0`.
+
+## 🚧 Roadmap
+
+### v1.x
+
+- UX improvements and workflow refinements
+- Add more intelligent `:Claude` subcommands
+- Improve diagnostics and configuration options
+
+### v2.0
+
+- Official Neovim support
+- Improved terminal/window handling
+- Floating window UI (Neovim)
 
 ## License
 
