@@ -1,7 +1,7 @@
 # vim-claude-code
 
 [![CI](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml/badge.svg)](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml)
-[![Version](https://img.shields.io/badge/version-1.0.0-blue.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/version-1.0.1-blue.svg)](CHANGELOG.md)
 
 A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI directly into your editor. Run Claude Code in a managed terminal, send code context with a single keystroke, and get automatic file reloading when Claude edits your files — all without leaving Vim.
 
