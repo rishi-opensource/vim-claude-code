@@ -34,6 +34,7 @@ let s:defaults = {
       \ 'map_verbose':        '<Leader>cV',
       \ 'debug':              0,
       \ 'terminal_start_delay': 300,
+      \ 'scroll_keys':           1,
       \ }
 
 " Get a configuration value.

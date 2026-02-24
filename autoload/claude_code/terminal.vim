@@ -347,4 +347,9 @@ function! s:configure_term_window() abort
   setlocal bufhidden=hide
   setlocal winfixheight
   setlocal winfixwidth
+  " Ensure mouse events (clicks, scroll wheel) are always active in this
+  " window regardless of the user's global 'mouse' setting.  Without this,
+  " touchpad and mouse scroll events never reach Vim when the terminal window
+  " is focused, so ScrollWheelUp/Down tnoremap bindings cannot fire.
+  setlocal mouse=a
 endfunction
