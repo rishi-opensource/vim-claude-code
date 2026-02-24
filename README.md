@@ -21,48 +21,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 ![vim-claude-code highlight reel](assets/00-highlight-reel.gif)
 
 > **7 key features in one clip** — toggle, fix, test generation, explain, git workflow, command discovery, and refactor.
-> See [DEMO.md](DEMO.md) for individual walkthroughs of all 15 features.
-
----
-
-
-### One-key toggle — open, hide, restore
-> `<C-\>` opens Claude in a split. Same key hides it. Session is never lost.
-
-![Toggle terminal](assets/01-toggle-terminal.gif)
-
----
-
-### Instant bug fixing — `:Claude fix --apply`
-> Claude spots the SQL injection and resource leak, patches the file in place.
-
-![Fix bugs](assets/02-fix-bugs.gif)
-
----
-
-### Visual selection → test generation
-> Select a function with `Shift-V`, run `:Claude test --edge-cases`. Nine tests written automatically.
-
-![Generate tests from selection](assets/03-visual-select-test.gif)
-
----
-
-### Git workflow — commit message + PR description
-> `:Claude commit --conventional` reads your staged diff and writes a Conventional Commit. `:Claude pr` produces a full PR description with Summary, Changes, and Testing sections.
-
-![Git workflow](assets/04-git-workflow.gif)
-
----
-
-### Command discovery with `<Tab>`
-> All 22 sub-commands live under `:Claude`. Type `:Claude <Tab>` to browse, filter by typing, and run — without memorising anything.
-
-![Command discovery](assets/05-command-discovery.gif)
-
----
-
-→ **[View all 15 feature demos in DEMO.md](DEMO.md)**
-
+> See [DEMO.md](DEMO.md) for individual walkthroughs of other features.
 
 ## Requirements
 
@@ -78,7 +37,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 
 ### [vim-plug](https://github.com/junegunn/vim-plug)
 ```vim
-" Always track latest
+" Always track latest (recommended)
 Plug 'rishi-opensource/vim-claude-code'
 
 " Pin to stable release
