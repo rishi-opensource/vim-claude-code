@@ -9,9 +9,9 @@
 " Plugin constants
 " ---------------------------------------------------------------------------
 
-Execute (g:claude_code_version is set to 1.0.0):
+Execute (g:claude_code_version is set to 1.1.0):
   Assert exists('g:claude_code_version')
-  AssertEqual '1.0.0', g:claude_code_version
+  AssertEqual '1.1.0', g:claude_code_version
 
 " ---------------------------------------------------------------------------
 " Util: error / debug / confirm helpers
