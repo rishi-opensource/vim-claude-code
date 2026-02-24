@@ -66,14 +66,6 @@ cd ~/.vim/pack/plugins/start
 git clone --branch v1.0.0 https://github.com/rishi-opensource/vim-claude-code.git
 ```
 
-### Manual
-Copy `plugin/`, `autoload/`, and `doc/` into `~/.vim/`, then run inside Vim:
-```vim
-:helptags ALL
-```
-> Run `:helptags ALL` whenever you install or update the plugin to ensure
-> `:help claude-code` works correctly.
-
 ## Quick Start
 
 Run `:Claude` or press `<C-\>` to open Claude Code. Press it again to hide; again to restore. The session persists.
