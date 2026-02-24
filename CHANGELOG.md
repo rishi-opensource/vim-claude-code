@@ -6,6 +6,16 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.0.1] – 2026-02-24
+
+### Fixed
+- Restore scroll behaviour for Claude response split window
+- Ensure standard Vim scrolling works on response buffer (line-up/down, mouse wheel, PageUp/PageDown)
+- Resolved buffer options that prevented scrolling in certain terminals
+
+### Improved
+- Better buffer configuration for Claude output to support navigation and movement keys
+
 ## [1.0.0] — 2026-02-24
 
 ### Added
