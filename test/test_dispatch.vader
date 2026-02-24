@@ -59,7 +59,7 @@ Execute (config#get returns default command):
   AssertEqual 'claude', claude_code#config#get('command')
 
 Execute (config#get returns default position):
-  AssertEqual 'bottom', claude_code#config#get('position')
+  AssertEqual 'right', claude_code#config#get('position')
 
 Execute (config#get returns default debug = 0):
   AssertEqual 0, claude_code#config#get('debug')

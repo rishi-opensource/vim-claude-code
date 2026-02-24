@@ -20,7 +20,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 
 ![vim-claude-code highlight reel](assets/00-highlight-reel.gif)
 
-> **7 key features in one clip** — toggle, fix, test generation, explain, git workflow, command discovery, and refactor.
+> **Key features in one clip** — toggle, fix, test generation, explain, git workflow, command discovery, and refactor.
 > See [DEMO.md](DEMO.md) for individual walkthroughs of other features.
 
 ## Requirements
@@ -74,26 +74,9 @@ Copy `plugin/`, `autoload/`, and `doc/` into `~/.vim/`, then run inside Vim:
 > Run `:helptags ALL` whenever you install or update the plugin to ensure
 > `:help claude-code` works correctly.
 
-## Releases
-
-Stable releases are published as annotated git tags on GitHub.
-
-| Release | Date | Notes |
-|---|---|---|
-| [v1.0.0](https://github.com/rishi-opensource/vim-claude-code/releases/tag/v1.0.0) | 2026-02-24 | First stable release |
-
-See [CHANGELOG.md](CHANGELOG.md) for full details.
-
-To upgrade to a specific release with pathogen or native packages:
-```sh
-cd ~/.vim/bundle/vim-claude-code   # or your pack path
-git fetch --tags
-git checkout v1.0.0
-```
-
 ## Quick Start
 
-Press `<C-\>` to open Claude Code. Press it again to hide; again to restore. The session persists.
+Run `:Claude` or press `<C-\>` to open Claude Code. Press it again to hide; again to restore. The session persists.
 
 All sub-commands are tab-completable:
 ```
@@ -336,3 +319,7 @@ printed to the message area. Disable again with `let g:claude_code_debug = 0`.
 ## License
 
 MIT — see [LICENSE](LICENSE).
+
+## Changelog
+
+See [CHANGELOG.md](CHANGELOG.md) for full details.
