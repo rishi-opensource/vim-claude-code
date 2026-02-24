@@ -11,8 +11,8 @@ let g:autoloaded_claude_code_config = 1
 " Users override these by setting g:claude_code_<key> in their vimrc.
 let s:defaults = {
       \ 'command':            'claude',
-      \ 'split_ratio':        0.3,
-      \ 'position':           'bottom',
+      \ 'split_ratio':        0.4,
+      \ 'position':           'right',
       \ 'enter_insert':       1,
       \ 'hide_numbers':       1,
       \ 'hide_signcolumn':    1,
