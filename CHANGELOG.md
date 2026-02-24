@@ -6,6 +6,15 @@ Versioning follows [Semantic Versioning](https://semver.org/).
 
 ---
 
+## [1.1.0] – 2026-02-25
+
+### Changed
+- **New default layout** — `g:claude_code_position` now defaults to `'right'` (vertical split) for improved readability and side-by-side context.
+- **Documentation overhaul** — Streamlined `README.md`, moved changelog to the bottom, and clarified Quick Start commands.
+
+### Internal
+- Updated project version constants and badges to `1.1.0`.
+
 ## [1.0.1] – 2026-02-24
 
 ### Fixed

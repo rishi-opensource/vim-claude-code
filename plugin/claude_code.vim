@@ -21,7 +21,7 @@ let g:loaded_claude_code = 1
 " Plugin constants
 " ---------------------------------------------------------------------------
 
-let g:claude_code_version = "1.0.0"
+let g:claude_code_version = "1.1.0"
 " Initialise debug flag from user config (defaults to 0 via config.vim).
 " We use get() here so it works even before config.vim is autoloaded.
 let g:claude_code_debug = get(g:, 'claude_code_debug', 0)
