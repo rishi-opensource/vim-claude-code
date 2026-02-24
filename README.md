@@ -18,6 +18,14 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 
 ## Demos
 
+![vim-claude-code highlight reel](assets/00-highlight-reel.gif)
+
+> **7 key features in one clip** — toggle, fix, test generation, explain, git workflow, command discovery, and refactor.
+> See [DEMO.md](DEMO.md) for individual walkthroughs of all 15 features.
+
+---
+
+
 ### One-key toggle — open, hide, restore
 > `<C-\>` opens Claude in a split. Same key hides it. Session is never lost.
 
@@ -50,6 +58,10 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 > All 22 sub-commands live under `:Claude`. Type `:Claude <Tab>` to browse, filter by typing, and run — without memorising anything.
 
 ![Command discovery](assets/05-command-discovery.gif)
+
+---
+
+→ **[View all 15 feature demos in DEMO.md](DEMO.md)**
 
 
 ## Requirements
