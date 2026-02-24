@@ -73,7 +73,7 @@ Generate help tags after installing: >
 ==============================================================================
 4. QUICK START                                        *claude-code-quickstart*
 
-Press `<C-\>` to open Claude Code in a split at the bottom of the screen.
+Press `<C-\>` to open Claude Code in a vertical split on the right side of the screen.
 Press it again to hide, and again to restore — the session persists.
 
 Or use the command directly: >
@@ -303,19 +303,19 @@ To disable all default keymaps: >
 
 Controlled by |g:claude_code_position|:
 
-  bottom  Horizontal split at the bottom (default)
+  bottom  Horizontal split at the bottom
   top     Horizontal split at the top
   left    Vertical split on the left
-  right   Vertical split on the right
+  right   Vertical split on the right (default)
   float   Floating popup window (requires +popupwin)
   tab     Dedicated tab page
 
-If 'float' is selected but Vim lacks +popupwin, falls back to 'bottom'.
+If 'float' is selected but Vim lacks +popupwin, falls back to 'right'.
 
 Examples: >
-    " Vertical right split at 40%
-    let g:claude_code_position   = 'right'
-    let g:claude_code_split_ratio = 0.4
+    " Bottom split at 30% (override the default right split)
+    let g:claude_code_position   = 'bottom'
+    let g:claude_code_split_ratio = 0.3
 
     " Floating popup with double border
     let g:claude_code_position    = 'float'
@@ -335,11 +335,11 @@ g:claude_code_command             Default: 'claude'
     CLI executable name or full path.
 
                                                    *g:claude_code_position*
-g:claude_code_position            Default: 'bottom'
+g:claude_code_position            Default: 'right'
     Window layout. See |claude-code-windows|.
 
                                                 *g:claude_code_split_ratio*
-g:claude_code_split_ratio         Default: 0.3
+g:claude_code_split_ratio         Default: 0.4
     Terminal window size as fraction of screen (0.0 – 1.0).
 
                                                *g:claude_code_enter_insert*

@@ -10,7 +10,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 - **One-key toggle** — Open and close Claude Code with `<C-\>`
 - **22 sub-commands** — Explain, fix, refactor, test, document, commit, review, and more
 - **Selection-aware** — Commands use visual selection when active, otherwise detect the current function
-- **Multiple window layouts** — Bottom split, top split, vertical split, floating popup, or dedicated tab
+- **Multiple window layouts** — Right split (default), bottom split, top split, floating popup, or dedicated tab
 - **Automatic file refresh** — Buffers reload when Claude modifies files on disk
 - **Git-aware** — Starts Claude at the repository root; separate sessions per repo
 - **Health check** — `:Claude doctor` verifies your environment before you start
@@ -205,17 +205,17 @@ Set `g:claude_code_position` to one of:
 
 | Value | Layout |
 |---|---|
-| `'bottom'` | Horizontal split at the bottom (default) |
+| `'bottom'` | Horizontal split at the bottom |
 | `'top'` | Horizontal split at the top |
 | `'left'` | Vertical split on the left |
-| `'right'` | Vertical split on the right |
+| `'right'` | Vertical split on the right (default) |
 | `'float'` | Floating popup (requires `+popupwin`) |
 | `'tab'` | Dedicated tab page |
 
 ```vim
-" Right split at 40%
-let g:claude_code_position   = 'right'
-let g:claude_code_split_ratio = 0.4
+" Bottom split at 30% (override the default right split)
+let g:claude_code_position   = 'bottom'
+let g:claude_code_split_ratio = 0.3
 
 " Floating popup
 let g:claude_code_position    = 'float'
@@ -229,8 +229,8 @@ let g:claude_code_float_border = 'double'
 | Variable | Default | Description |
 |---|---|---|
 | `g:claude_code_command` | `'claude'` | CLI executable |
-| `g:claude_code_position` | `'bottom'` | Window layout |
-| `g:claude_code_split_ratio` | `0.3` | Terminal size (0.0–1.0) |
+| `g:claude_code_position` | `'right'` | Window layout |
+| `g:claude_code_split_ratio` | `0.4` | Terminal size (0.0–1.0) |
 | `g:claude_code_enter_insert` | `1` | Auto-enter Terminal mode on focus |
 | `g:claude_code_hide_numbers` | `1` | Hide line numbers in terminal |
 | `g:claude_code_hide_signcolumn` | `1` | Hide sign column in terminal |
