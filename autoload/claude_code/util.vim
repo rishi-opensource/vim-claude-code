@@ -106,3 +106,51 @@ function! claude_code#util#code_target() abort
   let l:sel = claude_code#util#visual_selection()
   return empty(l:sel) ? claude_code#util#current_function() : l:sel
 endfunction
+" Return the pixel-art mascot as a list of strings.
+function! claude_code#util#get_mascot() abort
+  return [
+        \ '      ▄▄▄▄▄▄▄      ',
+        \ '    ▄▀       ▀▄    ',
+        \ '   █  █     █  █   ',
+        \ '   █           █   ',
+        \ '    ▀▄  ▀▀▀  ▄▀    ',
+        \ '      ▀▀▀▀▀▀▀      ',
+        \ '       █   █       ',
+        \ '      ▀▀   ▀▀      ',
+        \ ]
+endfunction
+
+" Return the splash screen content as a list of strings.
+function! claude_code#util#get_welcome_lines() abort
+  let l:user = $USER
+  if empty(l:user)
+    let l:user = 'Rishi'
+  endif
+
+  let l:mascot = claude_code#util#get_mascot()
+  let l:model  = claude_code#config#get('model', 'Sonnet 4.6')
+  let l:cwd    = getcwd()
+  let l:cwd_short = substitute(l:cwd, '^' . expand('~'), '~', '')
+
+  let l:lines = [
+        \ '',
+        \ '      Welcome back ' . l:user . '!',
+        \ '',
+        \ ]
+  call extend(l:lines, l:mascot)
+  call extend(l:lines, [
+        \ '',
+        \ '          ' . l:model,
+        \ '       API Usage Billing',
+        \ '     ' . l:cwd_short,
+        \ '',
+        \ '──────────────────────────────────',
+        \ '',
+        \ ' > Try "fix typecheck errors"',
+        \ '',
+        \ '──────────────────────────────────',
+        \ ' ? for shortcuts',
+        \ ])
+
+  return l:lines
+endfunction

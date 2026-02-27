@@ -143,6 +143,9 @@ function! s:create_new(instance_id) abort
       silent! normal! i
     endif
   endif
+
+  " Show splash screen content.
+  call s:show_splash_screen(l:bufnr)
 endfunction
 
 " Create terminal inside a split window.
@@ -334,6 +337,20 @@ function! s:set_buffer_name(bufnr, instance_id) abort
   endtry
 endfunction
 
+" Show the splash screen in a terminal buffer.
+function! s:show_splash_screen(bufnr) abort
+  let l:lines = claude_code#util#get_welcome_lines()
+  " In a terminal buffer we can use term_sendkeys if it's still starting,
+  " or simply append to the buffer if it's a normal window.
+  " However, for a 'terminal' buffer, we should send keys to the job.
+  " But the user wants a 'splash screen' look which is better as a buffer content.
+  " Since it IS a terminal buffer running 'claude', we should let 'claude' start.
+  " To match the screenshot exactly (which looks like a terminal output),
+  " we'll just let it be. BUT the user said "the GIF show different pictures".
+  " I will append the splash screen to the buffer if possible.
+  call appendbufline(a:bufnr, 1, l:lines)
+endfunction
+
 " Apply terminal-friendly options to the current window.
 function! s:configure_term_window() abort
   if claude_code#config#get('hide_numbers')
@@ -347,6 +364,8 @@ function! s:configure_term_window() abort
   setlocal bufhidden=hide
   setlocal winfixheight
   setlocal winfixwidth
+  " Apply theme background and highlight.
+  setlocal winhl=Normal:Normal,EndOfBuffer:Normal,VertSplit:ClaudeCodeBorder
   " Ensure mouse events (clicks, scroll wheel) are always active in this
   " window regardless of the user's global 'mouse' setting.  Without this,
   " touchpad and mouse scroll events never reach Vim when the terminal window

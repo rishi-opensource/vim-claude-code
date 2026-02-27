@@ -16,6 +16,15 @@ let s:border_styles = {
       \ 'none':    [],
       \ }
 
+" Define theme highlight groups.
+function! s:setup_highlights() abort
+  highlight default ClaudeCodeBorder guifg=#FF6B6B gui=bold
+  highlight default ClaudeCodeTitle  guifg=#FFFFFF guibg=#FF6B6B gui=bold
+  highlight default ClaudeCodeWelcome guifg=#FF6B6B
+endfunction
+
+call s:setup_highlights()
+
 " Translate user-friendly position names to Vim command modifiers.
 " Maps: bottom->botright, top->topleft, left->vertical topleft,
 "       right->vertical botright. Float and tab pass through as-is.
@@ -66,6 +75,8 @@ function! claude_code#window#build_float_opts(bufnr) abort
         \ 'col':         l:col + 1,
         \ 'zindex':      50,
         \ 'title':       ' Claude Code ',
+        \ 'highlight':   'Normal',
+        \ 'borderhighlight': ['ClaudeCodeBorder'],
         \ }
 
   " Only add border if borderchars is not empty (i.e., not 'none').
