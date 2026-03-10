@@ -1,355 +1,362 @@
-" claude_code/terminal.vim - Terminal buffer lifecycle management
-" Maintainer: Claude Code Vim Plugin
-" License: MIT
+vim9script
 
-if exists('g:autoloaded_claude_code_terminal')
-  finish
-endif
-let g:autoloaded_claude_code_terminal = 1
+# claude_code/terminal.vim - Terminal buffer lifecycle management
+# Maintainer: Claude Code Vim Plugin
+# License: MIT
 
-" Instance registry: instance_id -> bufnr
-let s:instances = {}
+import './config.vim'
+import './util.vim'
+import './git.vim'
+import './window.vim'
+import './keymaps.vim'
+import './refresh.vim'
 
-" Temporary variant flag appended to the command for one toggle cycle.
-let s:pending_variant = ''
+# Instance registry: instance_id -> bufnr
+var instances: dict<number> = {}
 
-" ---------------------------------------------------------------------------
-" Public API
-" ---------------------------------------------------------------------------
+# Temporary variant flag appended to the command for one toggle cycle.
+var pending_variant = ''
 
-" Toggle the Claude Code terminal, optionally with a subcommand variant.
-" If a terminal for the current instance exists and is visible, hide it.
-" If it exists but is hidden, show it. Otherwise create a new one.
-" When a variant name is given (e.g. 'continue'), the corresponding CLI
-" flag is appended on first creation only.
-function! claude_code#terminal#toggle(...) abort
-  let l:variant_name = a:0 ? a:1 : ''
-  call claude_code#util#debug('terminal#toggle variant=' . l:variant_name)
+# ---------------------------------------------------------------------------
+# Public API
+# ---------------------------------------------------------------------------
 
-  " Resolve variant flag when a subcommand is provided.
-  if !empty(l:variant_name)
-    let l:flag = claude_code#config#get('variant_' . l:variant_name)
-    if type(l:flag) != v:t_string || empty(l:flag)
-      call claude_code#util#error('claude-code: unknown subcommand "' . l:variant_name . '"')
+# Toggle the Claude Code terminal, optionally with a subcommand variant.
+# If a terminal for the current instance exists and is visible, hide it.
+# If it exists but is hidden, show it. Otherwise create a new one.
+# When a variant name is given (e.g. 'continue'), the corresponding CLI
+# flag is appended on first creation only.
+export def Toggle(...args: list<string>)
+  var variant_name = args->len() > 0 ? args[0] : ''
+  util.Debug('terminal#toggle variant=' .. variant_name)
+
+  # Resolve variant flag when a subcommand is provided.
+  var flag = ''
+  if !empty(variant_name)
+    var val = config.Get('variant_' .. variant_name)
+    if type(val) != v:t_string || empty(val)
+      util.Error('claude-code: unknown subcommand "' .. variant_name .. '"')
       return
     endif
-  else
-    let l:flag = ''
+    flag = val
   endif
 
-  let l:id = s:get_instance_id()
-  let l:bufnr = get(s:instances, l:id, -1)
+  var id = GetInstanceId()
+  var bufnr = get(instances, id, -1)
 
-  if l:bufnr > 0 && s:is_valid(l:bufnr)
-    if s:is_visible(l:bufnr)
-      call claude_code#window#close_buf_windows(l:bufnr)
+  if bufnr > 0 && IsValid(bufnr)
+    if IsVisible(bufnr)
+      window.CloseBufWindows(bufnr)
     else
-      call s:show_existing(l:bufnr)
+      ShowExisting(bufnr)
     endif
   else
-    if !empty(l:flag)
-      let s:pending_variant = l:flag
+    if !empty(flag)
+      pending_variant = flag
     endif
-    call s:create_new(l:id)
-    let s:pending_variant = ''
+    CreateNew(id)
+    pending_variant = ''
   endif
-endfunction
+enddef
 
-" ---------------------------------------------------------------------------
-" Internal helpers
-" ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Internal helpers
+# ---------------------------------------------------------------------------
 
-" Determine the instance identifier.
-" In multi-instance mode this is the git root (or cwd as fallback).
-" In single-instance mode it is the fixed string 'global'.
-function! s:get_instance_id() abort
-  if !claude_code#config#get('multi_instance')
+# Determine the instance identifier.
+# In multi-instance mode this is the git root (or cwd as fallback).
+# In single-instance mode it is the fixed string 'global'.
+def GetInstanceId(): string
+  if !config.Get('multi_instance')
     return 'global'
   endif
-  if claude_code#config#get('use_git_root')
-    let l:root = claude_code#git#root()
-    if !empty(l:root)
-      return l:root
+  if config.Get('use_git_root')
+    var root = git.Root()
+    if !empty(root)
+      return root
     endif
   endif
   return getcwd()
-endfunction
+enddef
 
-" Build the shell command to execute.
-function! s:build_command(instance_id) abort
-  let l:cmd = claude_code#config#get('command')
+# Build the shell command to execute.
+def BuildCommand(instance_id: string): string
+  var cmd = config.Get('command')
 
-  " Append --model when the user has configured one.
-  let l:model = claude_code#config#get('model')
-  if !empty(l:model)
-    let l:cmd .= ' --model ' . shellescape(l:model)
+  # Append --model when the user has configured one.
+  var model = config.Get('model')
+  if !empty(model)
+    cmd ..= ' --model ' .. shellescape(model)
   endif
 
-  " Append pending variant flag.
-  if !empty(s:pending_variant)
-    let l:cmd .= ' ' . s:pending_variant
+  # Append pending variant flag.
+  if !empty(pending_variant)
+    cmd ..= ' ' .. pending_variant
   endif
 
-  " Wrap in pushd/popd when using a git root different from cwd.
-  if claude_code#config#get('use_git_root') && a:instance_id !=# getcwd() && a:instance_id !=# 'global'
-    let l:cmd = 'pushd ' . shellescape(a:instance_id) . ' && ' . l:cmd . ' ; popd'
+  # Wrap in pushd/popd when using a git root different from cwd.
+  if config.Get('use_git_root') && instance_id !=# getcwd() && instance_id !=# 'global'
+    cmd = 'pushd ' .. shellescape(instance_id) .. ' && ' .. cmd .. ' ; popd'
   endif
 
-  return l:cmd
-endfunction
+  return cmd
+enddef
 
-" Create a brand-new Claude Code terminal.
-function! s:create_new(instance_id) abort
-  call claude_code#util#debug('terminal: creating new instance for ' . a:instance_id)
-  let l:cmd = s:build_command(a:instance_id)
-  let l:pos = claude_code#window#resolve_position(claude_code#config#get('position'))
+# Create a brand-new Claude Code terminal.
+def CreateNew(instance_id: string)
+  util.Debug('terminal: creating new instance for ' .. instance_id)
+  var cmd = BuildCommand(instance_id)
+  var pos = window.ResolvePosition(config.Get('position'))
 
-  if l:pos ==# 'float' && has('popupwin')
-    let l:bufnr = s:create_float_terminal(l:cmd)
-  elseif l:pos ==# 'tab'
-    let l:bufnr = s:create_tab_terminal(l:cmd)
+  var bufnr = -1
+  if pos ==# 'float' && has('popupwin')
+    bufnr = CreateFloatTerminal(cmd)
+  elseif pos ==# 'tab'
+    bufnr = CreateTabTerminal(cmd)
   else
-    let l:bufnr = s:create_split_terminal(l:cmd, l:pos)
+    bufnr = CreateSplitTerminal(cmd, pos)
   endif
 
-  if l:bufnr <= 0
-    call claude_code#util#error('claude-code: failed to create terminal')
+  if bufnr <= 0
+    util.Error('claude-code: failed to create terminal')
     return
   endif
 
-  " Register instance.
-  let s:instances[a:instance_id] = l:bufnr
+  # Register instance.
+  instances[instance_id] = bufnr
 
-  " Apply buffer name.
-  call s:set_buffer_name(l:bufnr, a:instance_id)
+  # Apply buffer name.
+  SetBufferName(bufnr, instance_id)
 
-  " Terminal-local keymaps.
-  call claude_code#keymaps#setup_terminal(l:bufnr)
+  # Terminal-local keymaps.
+  keymaps.SetupTerminal(bufnr)
 
-  " Start file-refresh monitoring.
-  call claude_code#util#debug('terminal: refresh started')
-  call claude_code#refresh#start()
+  # Start file-refresh monitoring.
+  util.Debug('terminal: refresh started')
+  refresh.Start()
 
-  " Autocommand to clean up when the terminal job exits.
+  # Autocommand to clean up when the terminal job exits.
   augroup ClaudeCodeTermClose
-    execute 'autocmd! * <buffer=' . l:bufnr . '>'
-    execute 'autocmd BufWipeout <buffer=' . l:bufnr . '>'
-          \ . ' call claude_code#terminal#on_close(' . l:bufnr . ')'
+    execute 'autocmd! * <buffer=' .. bufnr .. '>'
+    execute 'autocmd BufWipeout <buffer=' .. bufnr .. '>'
+          .. ' call claude_code#terminal#OnClose(' .. bufnr .. ')'
   augroup END
 
-  " Enter terminal mode if configured.
-  if claude_code#config#get('enter_insert')
+  # Enter terminal mode if configured.
+  if config.Get('enter_insert')
     if mode() !=# 't'
       silent! normal! i
     endif
   endif
-endfunction
+enddef
 
-" Create terminal inside a split window.
-function! s:create_split_terminal(cmd, position) abort
-  let l:ratio = claude_code#config#get('split_ratio')
-  let l:is_vertical = (a:position =~# 'vert')
+# Create terminal inside a split window.
+def CreateSplitTerminal(cmd: string, position: string): number
+  var ratio = config.Get('split_ratio')
+  var is_vertical = (position =~# 'vert')
 
-  if l:is_vertical
-    let l:size = float2nr(round(&columns * l:ratio))
+  var size = 0
+  if is_vertical
+    size = float2nr(round(&columns * ratio))
   else
-    let l:size = float2nr(round(&lines * l:ratio))
+    size = float2nr(round(&lines * ratio))
   endif
 
-  let l:term_opts = {
-        \ 'term_finish': 'open',
-        \ 'term_name':   'claude-code',
-        \ 'curwin':      0,
-        \ 'norestore':   1,
-        \ }
+  var term_opts: dict<any> = {
+    term_finish: 'open',
+    term_name:   'claude-code',
+    curwin:      0,
+    norestore:   1,
+  }
 
-  " Use term_start with vertical/horizontal option.
-  if l:is_vertical
-    let l:term_opts['vertical'] = 1
-    let l:term_opts['term_cols'] = l:size
+  # Use term_start with vertical/horizontal option.
+  if is_vertical
+    term_opts['vertical'] = 1
+    term_opts['term_cols'] = size
   else
-    let l:term_opts['term_rows'] = l:size
+    term_opts['term_rows'] = size
   endif
 
-  let l:bufnr = term_start([&shell, '-c', a:cmd], l:term_opts)
+  var bufnr = term_start([&shell, '-c', cmd], term_opts)
 
-  " Move window to the correct edge.
-  if l:is_vertical
-    if a:position =~# 'topleft'
+  # Move window to the correct edge.
+  if is_vertical
+    if position =~# 'topleft'
       wincmd H
     else
       wincmd L
     endif
-    execute 'vertical resize ' . l:size
+    execute 'vertical resize ' .. size
   else
-    if a:position =~# 'botright'
+    if position =~# 'botright'
       wincmd J
     else
       wincmd K
     endif
-    execute 'resize ' . l:size
+    execute 'resize ' .. size
   endif
 
-  " Configure the window.
-  call s:configure_term_window()
+  # Configure the window.
+  ConfigureTermWindow()
 
-  return l:bufnr
-endfunction
+  return bufnr
+enddef
 
-" Create terminal inside a floating popup.
-function! s:create_float_terminal(cmd) abort
-  let l:popup_opts = claude_code#window#build_float_opts(0)
+# Create terminal inside a floating popup.
+def CreateFloatTerminal(cmd: string): number
+  var popup_opts = window.BuildFloatOpts(0)
 
-  let l:bufnr = term_start([&shell, '-c', a:cmd], {
-        \ 'hidden': 1,
-        \ 'term_finish': 'open',
-        \ 'term_name':   'claude-code',
-        \ 'norestore':   1,
-        \ })
+  var bufnr = term_start([&shell, '-c', cmd], {
+    hidden: 1,
+    term_finish: 'open',
+    term_name:   'claude-code',
+    norestore:   1,
+  })
 
-  call popup_create(l:bufnr, l:popup_opts)
-  return l:bufnr
-endfunction
+  popup_create(bufnr, popup_opts)
+  return bufnr
+enddef
 
-" Create terminal in a new tab.
-function! s:create_tab_terminal(cmd) abort
-  let l:bufnr = term_start([&shell, '-c', a:cmd], {
-        \ 'term_finish': 'open',
-        \ 'term_name':   'claude-code',
-        \ 'curwin':      0,
-        \ 'norestore':   1,
-        \ })
-  " Move to its own tab.
-  execute 'tab sbuffer ' . l:bufnr
-  " Close the split left behind in the original tab.
+# Create terminal in a new tab.
+def CreateTabTerminal(cmd: string): number
+  var bufnr = term_start([&shell, '-c', cmd], {
+    term_finish: 'open',
+    term_name:   'claude-code',
+    curwin:      0,
+    norestore:   1,
+  })
+  # Move to its own tab.
+  execute 'tab sbuffer ' .. bufnr
+  # Close the split left behind in the original tab.
   wincmd p
   if winnr('$') > 1
     close
   endif
-  " Switch back to the tab containing our terminal.
+  # Switch back to the tab containing our terminal.
   tablast
-  call s:configure_term_window()
-  return l:bufnr
-endfunction
+  ConfigureTermWindow()
+  return bufnr
+enddef
 
-" Re-show a hidden but valid terminal buffer.
-function! s:show_existing(bufnr) abort
-  let l:pos = claude_code#window#resolve_position(claude_code#config#get('position'))
+# Re-show a hidden but valid terminal buffer.
+def ShowExisting(bufnr: number)
+  var pos = window.ResolvePosition(config.Get('position'))
 
-  if l:pos ==# 'float' && has('popupwin')
-    call s:create_float_terminal_from_buf(a:bufnr)
-  elseif l:pos ==# 'tab'
-    execute 'tab sbuffer ' . a:bufnr
-    call s:configure_term_window()
+  if pos ==# 'float' && has('popupwin')
+    CreateFloatTerminalFromBuf(bufnr)
+  elseif pos ==# 'tab'
+    execute 'tab sbuffer ' .. bufnr
+    ConfigureTermWindow()
   else
-    let l:ratio = claude_code#config#get('split_ratio')
-    let l:is_vertical = (l:pos =~# 'vert')
+    var ratio = config.Get('split_ratio')
+    var is_vertical = (pos =~# 'vert')
 
-    execute l:pos . ' sbuffer ' . a:bufnr
+    execute pos .. ' sbuffer ' .. bufnr
 
-    if l:is_vertical
-      let l:size = float2nr(round(&columns * l:ratio))
-      execute 'vertical resize ' . l:size
+    if is_vertical
+      var size = float2nr(round(&columns * ratio))
+      execute 'vertical resize ' .. size
     else
-      let l:size = float2nr(round(&lines * l:ratio))
-      execute 'resize ' . l:size
+      var size = float2nr(round(&lines * ratio))
+      execute 'resize ' .. size
     endif
 
-    call s:configure_term_window()
+    ConfigureTermWindow()
   endif
 
-  " Re-enter terminal mode.
-  if claude_code#config#get('enter_insert')
+  # Re-enter terminal mode.
+  if config.Get('enter_insert')
     if mode() !=# 't'
       silent! normal! i
     endif
   endif
-endfunction
+enddef
 
-" Show an existing buffer in a floating popup.
-function! s:create_float_terminal_from_buf(bufnr) abort
-  let l:popup_opts = claude_code#window#build_float_opts(a:bufnr)
-  call popup_create(a:bufnr, l:popup_opts)
-endfunction
+# Show an existing buffer in a floating popup.
+def CreateFloatTerminalFromBuf(bufnr: number)
+  var popup_opts = window.BuildFloatOpts(bufnr)
+  popup_create(bufnr, popup_opts)
+enddef
 
-" Called when a Claude Code terminal buffer is wiped out.
-function! claude_code#terminal#on_close(bufnr) abort
-  " Remove from instance registry.
-  for [l:id, l:bn] in items(s:instances)
-    if l:bn ==# a:bufnr
-      call remove(s:instances, l:id)
+# Called when a Claude Code terminal buffer is wiped out.
+export def OnClose(bufnr: number)
+  # Remove from instance registry.
+  for [id, bn] in items(instances)
+    if bn == bufnr
+      remove(instances, id)
       break
     endif
   endfor
 
-  " If no more instances, stop file-refresh.
-  if empty(s:instances)
-    call claude_code#refresh#stop()
+  # If no more instances, stop file-refresh.
+  if empty(instances)
+    refresh.Stop()
   endif
-endfunction
+enddef
 
-" ---------------------------------------------------------------------------
-" Utility helpers
-" ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+# Utility helpers
+# ---------------------------------------------------------------------------
 
-" Check if a buffer is a valid, running terminal.
-function! s:is_valid(bufnr) abort
-  if !bufexists(a:bufnr)
-    return 0
+# Check if a buffer is a valid, running terminal.
+def IsValid(bufnr: number): bool
+  if !bufexists(bufnr)
+    return false
   endif
-  if getbufvar(a:bufnr, '&buftype') !=# 'terminal'
-    return 0
+  if getbufvar(bufnr, '&buftype') !=# 'terminal'
+    return false
   endif
-  " term_getstatus() returns e.g. 'running' or 'finished'.
-  return term_getstatus(a:bufnr) =~# 'running'
-endfunction
+  # term_getstatus() returns e.g. 'running' or 'finished'.
+  return term_getstatus(bufnr) =~# 'running'
+enddef
 
-" Check if a buffer is currently displayed in any window.
-function! s:is_visible(bufnr) abort
-  " Check regular windows.
-  if !empty(win_findbuf(a:bufnr))
-    return 1
+# Check if a buffer is currently displayed in any window.
+def IsVisible(bufnr: number): bool
+  # Check regular windows.
+  if !empty(win_findbuf(bufnr))
+    return true
   endif
-  " Check popup windows.
+  # Check popup windows.
   if has('popupwin')
-    for l:pid in popup_list()
-      if winbufnr(l:pid) ==# a:bufnr
-        return 1
+    for pid in popup_list()
+      if winbufnr(pid) == bufnr
+        return true
       endif
     endfor
   endif
-  return 0
-endfunction
+  return false
+enddef
 
-" Set a descriptive buffer name.
-function! s:set_buffer_name(bufnr, instance_id) abort
+# Set a descriptive buffer name.
+def SetBufferName(bufnr: number, instance_id: string)
   try
-    if a:instance_id ==# 'global'
-      call setbufvar(a:bufnr, 'claude_code_instance', 'global')
+    if instance_id ==# 'global'
+      setbufvar(bufnr, 'claude_code_instance', 'global')
     else
-      call setbufvar(a:bufnr, 'claude_code_instance', a:instance_id)
+      setbufvar(bufnr, 'claude_code_instance', instance_id)
     endif
   catch
-    " Silently ignore — buffer name collisions are harmless.
+    # Silently ignore — buffer name collisions are harmless.
   endtry
-endfunction
+enddef
 
-" Apply terminal-friendly options to the current window.
-function! s:configure_term_window() abort
-  if claude_code#config#get('hide_numbers')
+# Apply terminal-friendly options to the current window.
+def ConfigureTermWindow()
+  if config.Get('hide_numbers')
     setlocal nonumber
     setlocal norelativenumber
   endif
-  if claude_code#config#get('hide_signcolumn')
+  if config.Get('hide_signcolumn')
     setlocal signcolumn=no
   endif
   setlocal nobuflisted
   setlocal bufhidden=hide
   setlocal winfixheight
   setlocal winfixwidth
-  " Ensure mouse events (clicks, scroll wheel) are always active in this
-  " window regardless of the user's global 'mouse' setting.  Without this,
-  " touchpad and mouse scroll events never reach Vim when the terminal window
-  " is focused, so ScrollWheelUp/Down tnoremap bindings cannot fire.
+  # Ensure mouse events (clicks, scroll wheel) are always active in this
+  # window regardless of the user's global 'mouse' setting.  Without this,
+  # touchpad and mouse scroll events never reach Vim when the terminal window
+  # is focused, so ScrollWheelUp/Down tnoremap bindings cannot fire.
   setlocal mouse=a
-endfunction
+enddef
+

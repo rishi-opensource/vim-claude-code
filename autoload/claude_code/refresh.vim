@@ -1,95 +1,95 @@
-" claude_code/refresh.vim - File change detection and auto-reload
-" Maintainer: Claude Code Vim Plugin
-" License: MIT
+vim9script
 
-if exists('g:autoloaded_claude_code_refresh')
-  finish
-endif
-let g:autoloaded_claude_code_refresh = 1
+# claude_code/refresh.vim - File change detection and auto-reload
+# Maintainer: Claude Code Vim Plugin
+# License: MIT
 
-" State
-let s:timer_id = -1
-let s:saved_updatetime = -1
-let s:saved_autoread = -1
-let s:active = 0
+import './config.vim'
 
-" Start file-refresh monitoring.
-" Lowers 'updatetime' for faster CursorHold triggers and sets up both
-" event-driven and timer-based checktime calls.
-function! claude_code#refresh#start() abort
-  if !claude_code#config#get('refresh_enable') || s:active
+# State
+var timer_id = -1
+var saved_updatetime = -1
+var saved_autoread = -1
+var active = false
+
+# Start file-refresh monitoring.
+# Lowers 'updatetime' for faster CursorHold triggers and sets up both
+# event-driven and timer-based checktime calls.
+export def Start()
+  if !config.Get('refresh_enable') || active
     return
   endif
-  let s:active = 1
+  active = true
 
-  " Save and lower updatetime.
-  let s:saved_updatetime = &updatetime
-  " Lower updatetime to trigger CursorHold more frequently while Claude
-  " is active. 500ms is a reasonable balance — fast enough to catch file
-  " changes quickly, but not so aggressive that it interferes with other
-  " plugins (GitGutter, ALE, LSP clients) or floods swap file writes.
-  let &updatetime = 500
+  # Save and lower updatetime.
+  saved_updatetime = &updatetime
+  # Lower updatetime to trigger CursorHold more frequently while Claude
+  # is active. 500ms is a reasonable balance — fast enough to catch file
+  # changes quickly, but not so aggressive that it interferes with other
+  # plugins (GitGutter, ALE, LSP clients) or floods swap file writes.
+  &updatetime = 500
 
-  " Save and enable autoread so :checktime actually reloads silently.
-  let s:saved_autoread = &autoread
-  set autoread
+  # Save and enable autoread so :checktime actually reloads silently.
+  saved_autoread = &autoread
+  &autoread = true
 
-  " Event-driven refresh.
+  # Event-driven refresh.
   augroup ClaudeCodeRefresh
     autocmd!
-    autocmd CursorHold,CursorHoldI * call s:safe_checktime()
-    autocmd FocusGained,BufEnter   * call s:safe_checktime()
-    autocmd InsertLeave            * call s:safe_checktime()
-    " Notification on reload.
-    if claude_code#config#get('refresh_notify')
-      autocmd FileChangedShellPost * echomsg 'claude-code: buffer reloaded — ' . expand('<afile>')
+    autocmd CursorHold,CursorHoldI * SafeChecktime()
+    autocmd FocusGained,BufEnter   * SafeChecktime()
+    autocmd InsertLeave            * SafeChecktime()
+    # Notification on reload.
+    if config.Get('refresh_notify')
+      autocmd FileChangedShellPost * echomsg 'claude-code: buffer reloaded — ' .. expand('<afile>')
     endif
   augroup END
 
-  " Timer-based polling as a safety net.
-  let l:interval = claude_code#config#get('refresh_interval')
-  let s:timer_id = timer_start(l:interval, function('s:timer_checktime'), {'repeat': -1})
-endfunction
+  # Timer-based polling as a safety net.
+  var interval = config.Get('refresh_interval')
+  timer_id = timer_start(interval, TimerChecktime, {repeat: -1})
+enddef
 
-" Stop file-refresh monitoring and restore original updatetime.
-function! claude_code#refresh#stop() abort
-  if !s:active
+# Stop file-refresh monitoring and restore original updatetime.
+export def Stop()
+  if !active
     return
   endif
-  let s:active = 0
+  active = false
 
-  " Stop timer.
-  if s:timer_id >= 0
-    call timer_stop(s:timer_id)
-    let s:timer_id = -1
+  # Stop timer.
+  if timer_id >= 0
+    timer_stop(timer_id)
+    timer_id = -1
   endif
 
-  " Remove autocommands.
+  # Remove autocommands.
   augroup ClaudeCodeRefresh
     autocmd!
   augroup END
 
-  " Restore updatetime.
-  if s:saved_updatetime >= 0
-    let &updatetime = s:saved_updatetime
-    let s:saved_updatetime = -1
+  # Restore updatetime.
+  if saved_updatetime >= 0
+    &updatetime = saved_updatetime
+    saved_updatetime = -1
   endif
 
-  " Restore autoread.
-  if s:saved_autoread >= 0
-    let &autoread = s:saved_autoread
-    let s:saved_autoread = -1
+  # Restore autoread.
+  if saved_autoread >= 0
+    &autoread = saved_autoread != 0
+    saved_autoread = -1
   endif
-endfunction
+enddef
 
-" Run :checktime only when safe (buffer is a normal file on disk).
-function! s:safe_checktime() abort
+# Run :checktime only when safe (buffer is a normal file on disk).
+def SafeChecktime()
   if &buftype ==# '' && filereadable(expand('%'))
     silent! checktime
   endif
-endfunction
+enddef
 
-" Timer callback — runs checktime across all windows.
-function! s:timer_checktime(timer_id) abort
+# Timer callback — runs checktime across all windows.
+def TimerChecktime(_tid: number)
   silent! checktime
-endfunction
+enddef
+

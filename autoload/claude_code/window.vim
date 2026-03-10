@@ -1,103 +1,103 @@
-" claude_code/window.vim - Window layout management utilities
-" Maintainer: Claude Code Vim Plugin
-" License: MIT
+vim9script
 
-if exists('g:autoloaded_claude_code_window')
-  finish
-endif
-let g:autoloaded_claude_code_window = 1
+# claude_code/window.vim - Window layout management utilities
+# Maintainer: Claude Code Vim Plugin
+# License: MIT
 
-" Border character sets for popup windows.
-let s:border_styles = {
-      \ 'rounded': ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
-      \ 'single':  ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
-      \ 'double':  ['═', '║', '═', '║', '╔', '╗', '╝', '╚'],
-      \ 'solid':   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
-      \ 'none':    [],
-      \ }
+import './config.vim'
 
-" Translate user-friendly position names to Vim command modifiers.
-" Maps: bottom->botright, top->topleft, left->vertical topleft,
-"       right->vertical botright. Float and tab pass through as-is.
-let s:position_map = {
-      \ 'bottom': 'botright',
-      \ 'top':    'topleft',
-      \ 'left':   'vertical topleft',
-      \ 'right':  'vertical botright',
-      \ 'float':  'float',
-      \ 'tab':    'tab',
-      \ }
+# Border character sets for popup windows.
+const border_styles = {
+  rounded: ['─', '│', '─', '│', '╭', '╮', '╯', '╰'],
+  single:  ['─', '│', '─', '│', '┌', '┐', '┘', '└'],
+  double:  ['═', '║', '═', '║', '╔', '╗', '╝', '╚'],
+  solid:   [' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '],
+  none:    [],
+}
 
-" Get border characters for a given border style name.
-" Returns the character array or empty list for 'none'.
-function! claude_code#window#get_border_chars(border_name) abort
-  return get(s:border_styles, a:border_name, s:border_styles['rounded'])
-endfunction
+# Translate user-friendly position names to Vim command modifiers.
+# Maps: bottom->botright, top->topleft, left->vertical topleft,
+#       right->vertical botright. Float and tab pass through as-is.
+const position_map = {
+  bottom: 'botright',
+  top:    'topleft',
+  left:   'vertical topleft',
+  right:  'vertical botright',
+  float:  'float',
+  tab:    'tab',
+}
 
-" Resolve a position name to its Vim modifier.
-" Returns the modifier string or the original value if not found.
-function! claude_code#window#resolve_position(pos) abort
-  return get(s:position_map, a:pos, a:pos)
-endfunction
+# Get border characters for a given border style name.
+# Returns the character array or empty list for 'none'.
+export def GetBorderChars(border_name: string): list<string>
+  return get(border_styles, border_name, border_styles['rounded'])
+enddef
 
-" Build popup options for a floating window.
-" Returns a dictionary suitable for popup_create().
-function! claude_code#window#build_float_opts(bufnr) abort
-  let l:width_ratio  = claude_code#config#get('float_width')
-  let l:height_ratio = claude_code#config#get('float_height')
+# Resolve a position name to its Vim modifier.
+# Returns the modifier string or the original value if not found.
+export def ResolvePosition(pos: string): string
+  return get(position_map, pos, pos)
+enddef
 
-  let l:width  = float2nr(round(&columns * l:width_ratio))
-  let l:height = float2nr(round(&lines   * l:height_ratio))
-  let l:width  = max([l:width,  20])
-  let l:height = max([l:height, 5])
+# Build popup options for a floating window.
+# Returns a dictionary suitable for popup_create().
+export def BuildFloatOpts(bufnr: number): dict<any>
+  var width_ratio = config.Get('float_width')
+  var height_ratio = config.Get('float_height')
 
-  let l:col = (&columns - l:width)  / 2
-  let l:row = (&lines   - l:height) / 2
+  var width = float2nr(round(&columns * width_ratio))
+  var height = float2nr(round(&lines * height_ratio))
+  width = max([width, 20])
+  height = max([height, 5])
 
-  let l:border_name = claude_code#config#get('float_border')
-  let l:borderchars = claude_code#window#get_border_chars(l:border_name)
+  var col = (&columns - width) / 2
+  var row = (&lines - height) / 2
 
-  let l:opts = {
-        \ 'minwidth':    l:width,
-        \ 'maxwidth':    l:width,
-        \ 'minheight':   l:height,
-        \ 'maxheight':   l:height,
-        \ 'line':        l:row + 1,
-        \ 'col':         l:col + 1,
-        \ 'zindex':      50,
-        \ 'title':       ' Claude Code ',
-        \ }
+  var border_name = config.Get('float_border')
+  var borderchars = GetBorderChars(border_name)
 
-  " Only add border if borderchars is not empty (i.e., not 'none').
-  if !empty(l:borderchars)
-    let l:opts['border']      = [1, 1, 1, 1]
-    let l:opts['borderchars'] = l:borderchars
+  var opts: dict<any> = {
+    minwidth:  width,
+    maxwidth:  width,
+    minheight: height,
+    maxheight: height,
+    line:      row + 1,
+    col:       col + 1,
+    zindex:    50,
+    title:     ' Claude Code ',
+  }
+
+  # Only add border if borderchars is not empty (i.e., not 'none').
+  if !empty(borderchars)
+    opts['border'] = [1, 1, 1, 1]
+    opts['borderchars'] = borderchars
   endif
 
-  return l:opts
-endfunction
+  return opts
+enddef
 
-" Close all windows displaying a given buffer.
-" Returns the number of windows closed.
-function! claude_code#window#close_buf_windows(bufnr) abort
-  let l:closed = 0
-  for l:win_id in win_findbuf(a:bufnr)
-    let l:winnr = win_id2win(l:win_id)
-    if l:winnr > 0
-      execute l:winnr . 'wincmd c'
-      let l:closed += 1
+# Close all windows displaying a given buffer.
+# Returns the number of windows closed.
+export def CloseBufWindows(bufnr: number): number
+  var closed = 0
+  for win_id in win_findbuf(bufnr)
+    var winnr = win_id2win(win_id)
+    if winnr > 0
+      execute winnr .. 'wincmd c'
+      closed += 1
     endif
   endfor
 
-  " Also check for popup windows.
+  # Also check for popup windows.
   if has('popupwin')
-    for l:pid in popup_list()
-      if winbufnr(l:pid) ==# a:bufnr
-        call popup_close(l:pid)
-        let l:closed += 1
+    for pid in popup_list()
+      if winbufnr(pid) == bufnr
+        popup_close(pid)
+        closed += 1
       endif
     endfor
   endif
 
-  return l:closed
-endfunction
+  return closed
+enddef
+
