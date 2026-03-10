@@ -132,31 +132,32 @@ if claude_code#config#get('map_keys')
 endif
 
 if claude_code#config#get('map_extended_keys')
+  let s:map_extended_prefix = claude_code#config#get('map_extended_prefix')
   " Normal mode
-  nnoremap <silent> <Leader>ce  :Claude explain<CR>
-  nnoremap <silent> <Leader>cf  :Claude fix<CR>
-  nnoremap <silent> <Leader>cr  :Claude refactor<CR>
-  nnoremap <silent> <Leader>ct  :Claude test<CR>
-  nnoremap <silent> <Leader>cd  :Claude doc<CR>
-  nnoremap <silent> <Leader>cG  :Claude commit<CR>
-  nnoremap <silent> <Leader>cR  :Claude review<CR>
-  nnoremap <silent> <Leader>cp  :Claude pr<CR>
-  nnoremap <silent> <Leader>cP  :Claude plan<CR>
-  nnoremap <silent> <Leader>ca  :Claude analyze<CR>
-  nnoremap <silent> <Leader>cn  :Claude rename<CR>
-  nnoremap <silent> <Leader>co  :Claude optimize<CR>
-  nnoremap <silent> <Leader>cD  :Claude debug<CR>
-  nnoremap <silent> <Leader>cA  :Claude apply<CR>
-  nnoremap <silent> <Leader>cc  :Claude chat<CR>
-  nnoremap <silent> <Leader>cx  :Claude context<CR>
-  nnoremap <silent> <Leader>cm  :Claude model<CR>
-
-  " Visual mode
-  xnoremap <silent> <Leader>ce  :<C-u>Claude explain<CR>
-  xnoremap <silent> <Leader>cf  :<C-u>Claude fix<CR>
-  xnoremap <silent> <Leader>cr  :<C-u>Claude refactor<CR>
-  xnoremap <silent> <Leader>ct  :<C-u>Claude test<CR>
-  xnoremap <silent> <Leader>cd  :<C-u>Claude doc<CR>
-  xnoremap <silent> <Leader>cn  :<C-u>Claude rename<CR>
-  xnoremap <silent> <Leader>co  :<C-u>Claude optimize<CR>
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'e  :Claude explain<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'f  :Claude fix<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'r  :Claude refactor<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 't  :Claude test<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'd  :Claude doc<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'G  :Claude commit<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'R  :Claude review<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'p  :Claude pr<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'P  :Claude plan<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'a  :Claude analyze<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'n  :Claude rename<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'o  :Claude optimize<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'D  :Claude debug<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'A  :Claude apply<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'c  :Claude chat<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'x  :Claude context<CR>'
+  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'm  :Claude model<CR>'
+'
+  " Visual mode'
+  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'e  :<C-u>Claude explain<CR>'
+  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'f  :<C-u>Claude fix<CR>'
+  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'r  :<C-u>Claude refactor<CR>'
+  execute 'xnoremap <silent> ' . s:map_extended_prefix . 't  :<C-u>Claude test<CR>'
+  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'd  :<C-u>Claude doc<CR>'
+  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'n  :<C-u>Claude rename<CR>'
+  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'o  :<C-u>Claude optimize<CR>'
 endif

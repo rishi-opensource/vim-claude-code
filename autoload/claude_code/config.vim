@@ -20,6 +20,7 @@ let s:defaults = {
       \ 'multi_instance':     1,
       \ 'map_keys':           1,
       \ 'map_extended_keys':  1,
+      \ 'map_extended_prefix': '<Leader>c',
       \ 'refresh_enable':     1,
       \ 'refresh_interval':   1000,
       \ 'refresh_notify':     1,
