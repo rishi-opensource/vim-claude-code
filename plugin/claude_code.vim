@@ -151,8 +151,8 @@ if claude_code#config#get('map_extended_keys')
   execute 'nnoremap <silent> ' . s:map_extended_prefix . 'c  :Claude chat<CR>'
   execute 'nnoremap <silent> ' . s:map_extended_prefix . 'x  :Claude context<CR>'
   execute 'nnoremap <silent> ' . s:map_extended_prefix . 'm  :Claude model<CR>'
-'
-  " Visual mode'
+
+  " Visual mode
   execute 'xnoremap <silent> ' . s:map_extended_prefix . 'e  :<C-u>Claude explain<CR>'
   execute 'xnoremap <silent> ' . s:map_extended_prefix . 'f  :<C-u>Claude fix<CR>'
   execute 'xnoremap <silent> ' . s:map_extended_prefix . 'r  :<C-u>Claude refactor<CR>'

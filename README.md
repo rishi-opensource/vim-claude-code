@@ -152,7 +152,7 @@ Run a health check to verify your setup:
 | Terminal | `<C-\>` | Hide Claude Code terminal |
 | Terminal | `<C-h/j/k/l>` | Navigate to adjacent window |
 
-### Extended keymaps (`<Leader>c*`)
+### Extended keymaps (`g:claude_code_map_extended_prefix` + key)
 
 | Key | Command | Key | Command |
 |---|---|---|---|
@@ -216,6 +216,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_map_toggle` | `'<C-\>'` | Toggle key |
 | `g:claude_code_map_continue` | `'<Leader>cC'` | Continue key |
 | `g:claude_code_map_verbose` | `'<Leader>cV'` | Verbose key |
+| `g:claude_code_map_extended_prefix` | `'<Leader>c'` | Prefix for all extended keymaps |
 | `g:claude_code_refresh_enable` | `1` | Auto-reload changed buffers |
 | `g:claude_code_refresh_interval` | `1000` | Polling interval (ms) |
 | `g:claude_code_refresh_notify` | `1` | Notify on buffer reload |
