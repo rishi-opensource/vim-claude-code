@@ -26,6 +26,22 @@ let g:claude_code_version = "1.2.0"
 " We use get() here so it works even before config.vim is autoloaded.
 let g:claude_code_debug = get(g:, 'claude_code_debug', 0)
 
+" ---------------------------------------------------------------------------
+" UI Styling - Vertical Separator
+" ---------------------------------------------------------------------------
+
+function! s:apply_ui_styling() abort
+  " Set split character to a solid vertical block/line
+  set fillchars+=vert:│
+  " Style the vertical split to be dark with a light separator
+  highlight VertSplit ctermbg=NONE guibg=NONE ctermfg=gray guifg=#444444
+endfunction
+
+augroup ClaudeCodeUI
+  autocmd!
+  autocmd BufEnter claude-code* call s:apply_ui_styling()
+augroup END
+
 if !has('terminal')
   call claude_code#util#error('vim-claude-code: requires Vim 8.0+ compiled with +terminal support')
   finish
