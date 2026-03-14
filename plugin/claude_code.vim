@@ -43,7 +43,7 @@ function! s:complete(ArgLead, CmdLine, CursorPos) abort
         \ 'plan', 'analyze',
         \ 'rename', 'optimize', 'debug', 'apply',
         \ 'chat', 'context', 'model',
-        \ 'version', 'doctor',
+        \ 'version', 'doctor', 'flompt',
         \ ]
   return filter(copy(l:subs), 'v:val =~# "^" . a:ArgLead')
 endfunction
@@ -104,6 +104,8 @@ function! s:dispatch(args) abort
     call claude_code#meta_commands#version()
   elseif l:sub ==# 'doctor'
     call claude_code#meta_commands#doctor()
+  elseif l:sub ==# 'flompt'
+    call claude_code#commands#flompt(l:flags)
   else
     call claude_code#util#error('vim-claude-code: unknown sub-command "' . l:sub . '". Try :Claude <Tab>')
   endif

@@ -93,11 +93,11 @@ Run a health check to verify your setup:
 
 | Command | Flags | Description |
 |---|---|---|
-| `:Claude explain` | `--brief`, `--detailed` | Explain selected code or current function |
-| `:Claude fix` | `--apply`, `--safe` | Fix bugs and correctness issues |
-| `:Claude refactor` | `--extract`, `--simplify`, `--optimize`, `--rename` | Refactor code |
-| `:Claude test` | `--framework {name}`, `--edge-cases` | Generate unit tests |
-| `:Claude doc` | `--inline`, `--markdown` | Generate documentation |
+| `:Claude explain` | `--brief`, `--detailed`, `--flompt` | Explain selected code or current function |
+| `:Claude fix` | `--apply`, `--safe`, `--flompt` | Fix bugs and correctness issues |
+| `:Claude refactor` | `--extract`, `--simplify`, `--optimize`, `--rename`, `--flompt` | Refactor code |
+| `:Claude test` | `--framework {name}`, `--edge-cases`, `--flompt` | Generate unit tests |
+| `:Claude doc` | `--inline`, `--markdown`, `--flompt` | Generate documentation |
 
 ### Git
 
@@ -122,6 +122,7 @@ Run a health check to verify your setup:
 | `:Claude optimize` | Optimize code for performance |
 | `:Claude debug` | Analyze error on current line |
 | `:Claude apply` | Apply Claude's last suggestion to the file (prompts for confirmation) |
+| `:Claude flompt` | Use Flompt MCP to optimize a custom prompt and execute |
 
 ### Meta
 
@@ -224,6 +225,9 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_model` | `''` | Claude model override |
 | `g:claude_code_debug` | `0` | Enable debug logging to message area |
 | `g:claude_code_terminal_start_delay` | `300` | Delay (ms) before attaching to Claude terminal |
+| `g:claude_code_use_flompt` | `0` | Always optimize prompts using Flompt MCP |
+
+> **Note**: To use the `--flompt` flag or `:Claude flompt` command, you must first install the Flompt MCP server: `claude mcp add flompt https://flompt.dev/mcp/`.
 
 Buffer-local `b:claude_code_*` overrides take precedence over `g:` variables.
 

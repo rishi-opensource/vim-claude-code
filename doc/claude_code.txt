@@ -114,42 +114,47 @@ file is used.
 5.2 Code Intelligence                                    *claude-code-intel*
 
                                                            *:Claude-explain*
-:Claude explain [--brief|--detailed]
+:Claude explain [--brief|--detailed] [--flompt]
     Explain the selected code or current function.
 
     --brief     Short 2-3 sentence summary.
     --detailed  Thorough explanation including edge cases.
+    --flompt    Use Flompt MCP to optimize the prompt before executing.
 
                                                                *:Claude-fix*
-:Claude fix [--apply] [--safe]
+:Claude fix [--apply] [--safe] [--flompt]
     Fix bugs and correctness issues.
 
-    --apply  Apply changes directly without confirmation.
-    --safe   Use minimal, conservative changes only.
+    --apply     Apply changes directly without confirmation.
+    --safe      Use minimal, conservative changes only.
+    --flompt    Use Flompt MCP to optimize the prompt before executing.
 
                                                           *:Claude-refactor*
-:Claude refactor [--extract|--simplify|--optimize|--rename]
+:Claude refactor [--extract|--simplify|--optimize|--rename] [--flompt]
     Refactor the selected or current code.
 
     --extract   Extract reusable helpers.
     --simplify  Reduce complexity.
     --optimize  Improve performance.
     --rename    Suggest better identifier names.
+    --flompt    Use Flompt MCP to optimize the prompt before executing.
 
                                                               *:Claude-test*
-:Claude test [--framework {name}] [--edge-cases]
+:Claude test [--framework {name}] [--edge-cases] [--flompt]
     Generate unit tests.
 
     --framework {name}  Specify framework (jest, pytest, go-test, rspec...).
                         Auto-detected from filetype when omitted.
     --edge-cases        Include boundary and edge-case tests.
+    --flompt            Use Flompt MCP to optimize the prompt before executing.
 
                                                                *:Claude-doc*
-:Claude doc [--inline|--markdown]
+:Claude doc [--inline|--markdown] [--flompt]
     Generate documentation or docstrings.
 
     --inline    Add inline comments and docstrings.
     --markdown  Produce standalone Markdown documentation.
+    --flompt    Use Flompt MCP to optimize the prompt before executing.
 
 ------------------------------------------------------------------------------
 5.3 Git Commands                                        *claude-code-git-cmds*
@@ -204,6 +209,12 @@ file is used.
 :Claude apply
     Ask Claude to apply its last suggestion directly to the current file.
     Prompts for confirmation (y/n) before sending — press n to cancel.
+
+                                                            *:Claude-flompt*
+:Claude flompt [{prompt}]
+    Use Flompt MCP to optimize a custom prompt and execute. If no prompt
+    is provided, it defaults to analyzing the selected code or function.
+    Requires Flompt MCP to be installed (`claude mcp add flompt ...`).
 
 ------------------------------------------------------------------------------
 5.6 Meta Commands                                      *claude-code-meta-cmds*
@@ -427,6 +438,12 @@ g:claude_code_terminal_start_delay  Default: 300
     if commands fail to reach the terminal. >
         let g:claude_code_terminal_start_delay = 600
 <
+
+                                                  *g:claude_code_use_flompt*
+g:claude_code_use_flompt            Default: 0
+    Always add Flompt MCP instructions to supported commands (`explain`,
+    `fix`, `refactor`, `test`, `doc`). Requires user installation of the
+    Flompt MCP server (`claude mcp add flompt https://flompt.dev/mcp/`).
 
 ==============================================================================
 9. FILE REFRESH                                          *claude-code-refresh*

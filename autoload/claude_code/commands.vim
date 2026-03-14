@@ -21,8 +21,11 @@ function! claude_code#commands#explain(flags) abort
     let l:detail = 'Give a clear explanation.'
   endif
 
+  let l:use_flompt = a:flags =~# '--flompt' || claude_code#config#get('use_flompt')
+  let l:flompt = l:use_flompt ? "\n[FLOMPT] Use your Flompt MCP tools to decompose and compile a structured prompt before executing this task. " : ''
+
   call claude_code#terminal_bridge#send(
-        \ l:ctx . "\n" . l:detail .
+        \ l:ctx . "\n" . l:detail . l:flompt .
         \ "\n\nCode to explain:\n```\n" . l:code . "\n```\n")
 endfunction
 
@@ -33,9 +36,11 @@ function! claude_code#commands#fix(flags) abort
   let l:safe = a:flags =~# '--safe'  ? 'Use minimal, safe changes only.' : ''
   let l:hint = a:flags =~# '--apply' ? 'Apply the fix directly without asking.'
         \                             : 'Show a diff preview before applying.'
+  let l:use_flompt = a:flags =~# '--flompt' || claude_code#config#get('use_flompt')
+  let l:flompt = l:use_flompt ? "[FLOMPT] Use your Flompt MCP tools to decompose and compile a structured prompt before executing this task. " : ''
 
   call claude_code#terminal_bridge#send(
-        \ l:ctx . "\nTask: Fix any bugs or correctness issues. " .
+        \ l:ctx . "\nTask: Fix any bugs or correctness issues. " . l:flompt .
         \ l:safe . ' ' . l:hint .
         \ "\n\n```\n" . l:code . "\n```\n")
 endfunction
@@ -56,8 +61,11 @@ function! claude_code#commands#refactor(flags) abort
     let l:strategy = 'Suggest better, more descriptive names for variables and functions.'
   endif
 
+  let l:use_flompt = a:flags =~# '--flompt' || claude_code#config#get('use_flompt')
+  let l:flompt = l:use_flompt ? "[FLOMPT] Use your Flompt MCP tools to decompose and compile a structured prompt before executing this task. " : ''
+
   call claude_code#terminal_bridge#send(
-        \ l:ctx . "\nTask: " . l:strategy .
+        \ l:ctx . "\nTask: " . l:strategy . " " . l:flompt .
         \ "\n\n```\n" . l:code . "\n```\n")
 endfunction
 
@@ -82,8 +90,11 @@ function! claude_code#commands#test(flags) abort
   let l:edge_hint = a:flags =~# '--edge-cases'
         \ ? ' Include edge cases and boundary conditions.' : ''
 
+  let l:use_flompt = a:flags =~# '--flompt' || claude_code#config#get('use_flompt')
+  let l:flompt = l:use_flompt ? "[FLOMPT] Use your Flompt MCP tools to decompose and compile a structured prompt before executing this task. " : ''
+
   call claude_code#terminal_bridge#send(
-        \ l:ctx . "\nTask: Generate unit tests. " . l:fw_hint . l:edge_hint .
+        \ l:ctx . "\nTask: Generate unit tests. " . l:fw_hint . l:edge_hint . ' ' . l:flompt .
         \ "\n\n```\n" . l:code . "\n```\n")
 endfunction
 
@@ -100,8 +111,26 @@ function! claude_code#commands#doc(flags) abort
     let l:style = 'Generate appropriate docstrings/documentation comments.'
   endif
 
+  let l:use_flompt = a:flags =~# '--flompt' || claude_code#config#get('use_flompt')
+  let l:flompt = l:use_flompt ? "[FLOMPT] Use your Flompt MCP tools to decompose and compile a structured prompt before executing this task. " : ''
+
   call claude_code#terminal_bridge#send(
-        \ l:ctx . "\nTask: " . l:style .
+        \ l:ctx . "\nTask: " . l:style . " " . l:flompt .
+        \ "\n\n```\n" . l:code . "\n```\n")
+endfunction
+
+" 6. :Claude flompt
+function! claude_code#commands#flompt(flags) abort
+  let l:code = claude_code#util#code_target()
+  let l:ctx  = claude_code#util#file_context()
+  
+  " Optional custom prompt or instructions can be passed as flags
+  let l:custom = trim(a:flags)
+  let l:task = empty(l:custom) ? "Analyze the code." : l:custom
+
+  call claude_code#terminal_bridge#send(
+        \ l:ctx . "\nTask: " . l:task . 
+        \ "\n[FLOMPT] Use your Flompt MCP tools to decompose and compile a structured prompt to complete this task effectively." .
         \ "\n\n```\n" . l:code . "\n```\n")
 endfunction
 
