@@ -18,7 +18,8 @@ CONTENTS                                                 *claude-code-contents*
       5.4  Architecture & Planning ........ |claude-code-arch-cmds|
       5.5  Workflow Commands .............. |claude-code-workflow-cmds|
       5.6  Meta Commands .................. |claude-code-meta-cmds|
-      5.7  Utility Commands ............... |claude-code-utility-cmds|
+      5.7  Diff Preview Commands .......... |claude-code-preview-cmds|
+      5.8  Utility Commands ............... |claude-code-utility-cmds|
   6.  Keymaps ............................. |claude-code-keymaps|
   7.  Window Modes ........................ |claude-code-windows|
   8.  Configuration ....................... |claude-code-config|
@@ -230,7 +231,46 @@ file is used.
     Without an argument, opens an interactive picker.
 
 ------------------------------------------------------------------------------
-5.7 Utility Commands                             *claude-code-utility-cmds*
+5.7 Diff Preview Commands                        *claude-code-preview-cmds*
+
+                                                       *:Claude-preview*
+:Claude preview [install|uninstall|close|status]
+    Manage diff preview for Claude Code edit suggestions.
+
+    When enabled, every time Claude proposes a file edit (Edit, Write, or
+    MultiEdit), a side-by-side diff tab opens in Vim showing the CURRENT
+    file content on the left and the PROPOSED changes on the right. You
+    can review the diff before accepting or rejecting in the Claude terminal.
+
+    Sub-commands:
+
+    install     Install PreToolUse/PostToolUse hooks into
+                .claude/settings.local.json and start polling. This is
+                the first thing to run to enable diff preview.
+
+    uninstall   Remove the diff preview hooks and stop polling.
+
+    close       Manually close an open diff tab.
+
+    status      Show diff preview status and dependency checks.
+
+    No argument defaults to "install".
+
+    Requirements:
+    - python3 (for computing proposed file content)
+    - jq (for JSON processing in hook scripts)
+    - Optional: Vim +clientserver for instant diff (falls back to polling)
+
+    Quick start: >
+        :Claude preview install
+<
+    Or auto-enable on startup in your vimrc: >
+        let g:claude_code_diff_preview = 1
+<
+    Press q inside the diff tab to close it manually.
+
+------------------------------------------------------------------------------
+5.8 Utility Commands                             *claude-code-utility-cmds*
 
                                                           *:Claude-version*
 :Claude version
@@ -417,6 +457,15 @@ g:claude_code_debug               Default: 0
     Enable debug logging to the message area. When set to 1, logs all
     dispatch calls, git operations, terminal launches, and refresh events: >
         let g:claude_code_debug = 1
+<
+
+                                              *g:claude_code_diff_preview*
+g:claude_code_diff_preview           Default: 0
+    Automatically start diff preview polling on Vim startup.
+    When set to 1, Vim will poll for diff triggers from Claude Code hooks.
+    You still need to run :Claude preview install once per project to
+    register the hooks. >
+        let g:claude_code_diff_preview = 1
 <
 
                                        *g:claude_code_terminal_start_delay*

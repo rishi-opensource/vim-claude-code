@@ -146,6 +146,11 @@ function! claude_code#meta_commands#doctor() abort
     call add(l:lines, '[FAIL] Vim ' . string(v:version / 100) . '.' . string(v:version % 100) . ' is too old — Vim 8.0+ required')
   endif
 
+  " Diff preview dependencies
+  call add(l:lines, '')
+  call add(l:lines, 'Diff Preview:')
+  call extend(l:lines, claude_code#diff#check_deps())
+
   call add(l:lines, '──────────────────────────────────')
   call add(l:lines, 'Press q to close')
 

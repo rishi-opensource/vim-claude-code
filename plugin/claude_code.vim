@@ -44,6 +44,7 @@ function! s:complete(ArgLead, CmdLine, CursorPos) abort
         \ 'rename', 'optimize', 'debug', 'apply',
         \ 'chat', 'context', 'model',
         \ 'version', 'doctor',
+        \ 'preview',
         \ ]
   return filter(copy(l:subs), 'v:val =~# "^" . a:ArgLead')
 endfunction
@@ -104,6 +105,8 @@ function! s:dispatch(args) abort
     call claude_code#meta_commands#version()
   elseif l:sub ==# 'doctor'
     call claude_code#meta_commands#doctor()
+  elseif l:sub ==# 'preview'
+    call s:dispatch_preview(l:flags)
   else
     call claude_code#util#error('vim-claude-code: unknown sub-command "' . l:sub . '". Try :Claude <Tab>')
   endif
@@ -160,4 +163,45 @@ if claude_code#config#get('map_extended_keys')
   execute 'xnoremap <silent> ' . s:map_extended_prefix . 'd  :<C-u>Claude doc<CR>'
   execute 'xnoremap <silent> ' . s:map_extended_prefix . 'n  :<C-u>Claude rename<CR>'
   execute 'xnoremap <silent> ' . s:map_extended_prefix . 'o  :<C-u>Claude optimize<CR>'
+endif
+
+" ---------------------------------------------------------------------------
+" :Claude preview — diff preview sub-commands
+" ---------------------------------------------------------------------------
+
+function! s:dispatch_preview(flags) abort
+  let l:sub = trim(a:flags)
+
+  if l:sub ==# 'install' || l:sub ==# ''
+    call claude_code#diff#install_hooks()
+  elseif l:sub ==# 'uninstall'
+    call claude_code#diff#uninstall_hooks()
+  elseif l:sub ==# 'close'
+    call claude_code#diff#close()
+  elseif l:sub ==# 'status'
+    call s:preview_status()
+  else
+    call claude_code#util#error('claude-code: unknown preview command "' . l:sub . '". Try: install, uninstall, close, status')
+  endif
+endfunction
+
+function! s:preview_status() abort
+  let l:lines = [
+        \ '──────────────────────────────────',
+        \ ' Claude Code — Diff Preview Status',
+        \ '──────────────────────────────────',
+        \ 'Polling : ' . (claude_code#diff#is_polling() ? 'active' : 'inactive'),
+        \ 'Diff tab: ' . (claude_code#diff#is_open() ? 'open' : 'closed'),
+        \ '',
+        \ 'Dependencies:',
+        \ ]
+  call extend(l:lines, claude_code#diff#check_deps())
+  call add(l:lines, '──────────────────────────────────')
+  call add(l:lines, 'Press q to close')
+  call claude_code#util#open_scratch('Claude: Preview Status', l:lines)
+endfunction
+
+" Auto-start polling if diff_preview is enabled
+if claude_code#config#get('diff_preview')
+  call claude_code#diff#start_polling()
 endif

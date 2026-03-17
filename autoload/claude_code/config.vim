@@ -36,6 +36,7 @@ let s:defaults = {
       \ 'debug':              0,
       \ 'terminal_start_delay': 300,
       \ 'scroll_keys':           1,
+      \ 'diff_preview':          0,
       \ }
 
 " Get a configuration value.
