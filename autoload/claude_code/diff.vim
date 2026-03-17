@@ -17,6 +17,7 @@ let s:diff_tab = -1
 let s:diff_bufs = []
 let s:poll_timer = -1
 let s:trigger_dir = ''
+let s:plugin_root = fnamemodify(resolve(expand('<sfile>:p')), ':h:h:h')
 
 " ---------------------------------------------------------------------------
 " Polling — file-based IPC for hook → Vim communication
@@ -26,7 +27,7 @@ function! claude_code#diff#start_polling() abort
   if s:poll_timer >= 0
     return
   endif
-  let s:trigger_dir = exists('$TMPDIR') ? $TMPDIR : '/tmp'
+  let s:trigger_dir = substitute(exists('$TMPDIR') ? $TMPDIR : '/tmp', '/$', '', '')
   let s:poll_timer = timer_start(300, function('s:check_trigger'), {'repeat': -1})
   call claude_code#util#debug('diff: polling started (' . s:trigger_dir . ')')
 endfunction
@@ -56,7 +57,9 @@ function! s:check_trigger(timer_id) abort
       let l:raw = join(readfile(l:open_trigger), "\n")
       call delete(l:open_trigger)
       let l:data = json_decode(l:raw)
-      call claude_code#diff#show(l:data.orig, l:data.proposed, l:data.display_name)
+      if filereadable(l:data.orig) && filereadable(l:data.proposed)
+        call claude_code#diff#show(l:data.orig, l:data.proposed, l:data.display_name)
+      endif
     catch
       call claude_code#util#error('claude-code: failed to parse diff trigger — ' . v:exception)
     endtry
@@ -116,13 +119,15 @@ function! claude_code#diff#show(orig_file, proposed_file, display_name) abort
   wincmd =
   normal! gg]c
 
-  " Keymap: q to close diff tab
+  " Keymaps: q to close, ga to accept, gr to reject
   for l:buf in s:diff_bufs
     call setbufvar(l:buf, '&buflisted', 0)
     execute 'nnoremap <buffer> <silent> q :call claude_code#diff#close()<CR>'
+    execute 'nnoremap <buffer> <silent> ga :call claude_code#diff#accept()<CR>'
+    execute 'nnoremap <buffer> <silent> gr :call claude_code#diff#reject()<CR>'
   endfor
 
-  echomsg 'claude-code: diff preview for ' . a:display_name . ' — accept/reject in Claude terminal (q to close)'
+  echomsg 'claude-code: diff preview for ' . a:display_name . ' — ga accept | gr reject | q close'
 endfunction
 
 " ---------------------------------------------------------------------------
@@ -167,6 +172,26 @@ function! claude_code#diff#close() abort
 endfunction
 
 " ---------------------------------------------------------------------------
+" Accept / Reject — send response to Claude terminal and close diff
+" ---------------------------------------------------------------------------
+
+function! claude_code#diff#accept() abort
+  call claude_code#diff#close()
+  let l:bnr = claude_code#terminal_bridge#get_buf()
+  if l:bnr >= 0
+    call term_sendkeys(l:bnr, "y")
+  endif
+endfunction
+
+function! claude_code#diff#reject() abort
+  call claude_code#diff#close()
+  let l:bnr = claude_code#terminal_bridge#get_buf()
+  if l:bnr >= 0
+    call term_sendkeys(l:bnr, "n")
+  endif
+endfunction
+
+" ---------------------------------------------------------------------------
 " Status
 " ---------------------------------------------------------------------------
 
@@ -183,10 +208,7 @@ endfunction
 " ---------------------------------------------------------------------------
 
 function! s:bin_dir() abort
-  " Resolve the plugin's bin/ directory
-  let l:this_file = resolve(expand('<sfile>:p'))
-  " autoload/claude_code/diff.vim -> go up 3 levels to plugin root
-  return fnamemodify(l:this_file, ':h:h:h') . '/bin'
+  return s:plugin_root . '/bin'
 endfunction
 
 function! claude_code#diff#install_hooks() abort
