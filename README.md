@@ -164,7 +164,7 @@ let g:claude_code_diff_preview = 1
 
 | Mode | Key | Action |
 |---|---|---|
-| Normal | `<C-\>` | Toggle Claude Code terminal |
+| Normal | `<C-;>` | Toggle Claude Code terminal |
 | Normal | `<Leader>cC` | Toggle with `--continue` |
 | Normal | `<Leader>cV` | Toggle with `--verbose` |
 | Terminal | `<C-\>` | Hide Claude Code terminal |
