@@ -13,6 +13,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 - **Multiple window layouts** — Right split (default), bottom split, top split, floating popup, or dedicated tab
 - **Automatic file refresh** — Buffers reload when Claude modifies files on disk
 - **Git-aware** — Starts Claude at the repository root; separate sessions per repo
+- **Diff preview** — Side-by-side diff tab when Claude proposes file edits (Edit, Write, MultiEdit)
 - **Health check** — `:Claude doctor` verifies your environment before you start
 - **Configurable** — 20+ `g:` variables with buffer-local overrides
 
@@ -28,6 +29,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 - Vim 8+ compiled with `+terminal`
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and in `$PATH`
 - Optional: `+popupwin` for floating window mode
+- Optional: `python3` and `jq` for diff preview (`:Claude preview`)
 
 ## Installation
 
@@ -122,6 +124,24 @@ Run a health check to verify your setup:
 | `:Claude optimize` | Optimize code for performance |
 | `:Claude debug` | Analyze error on current line |
 | `:Claude apply` | Apply Claude's last suggestion to the file (prompts for confirmation) |
+
+### Diff Preview
+
+| Command | Description |
+|---|---|
+| `:Claude preview install` | Register diff preview hooks in `.claude/settings.local.json` |
+| `:Claude preview uninstall` | Remove diff preview hooks |
+| `:Claude preview close` | Manually close an open diff tab |
+| `:Claude preview status` | Show diff preview status and dependency checks |
+
+When enabled, every time Claude proposes a file edit (Edit, Write, or MultiEdit), a side-by-side diff tab opens showing the **current** file on the left and the **proposed** changes on the right. Review the diff, then accept or reject in the Claude terminal. Press `q` to close the diff tab.
+
+Requires `python3` and `jq`. Optionally uses Vim `+clientserver` for instant diffs (falls back to file-based polling).
+
+Auto-enable on startup:
+```vim
+let g:claude_code_diff_preview = 1
+```
 
 ### Meta
 
@@ -223,6 +243,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_float_border` | `'rounded'` | Border style |
 | `g:claude_code_model` | `''` | Claude model override |
 | `g:claude_code_debug` | `0` | Enable debug logging to message area |
+| `g:claude_code_diff_preview` | `0` | Auto-start diff preview polling on Vim startup |
 | `g:claude_code_terminal_start_delay` | `300` | Delay (ms) before attaching to Claude terminal |
 
 Buffer-local `b:claude_code_*` overrides take precedence over `g:` variables.
@@ -247,7 +268,12 @@ vim-claude-code/
 │       ├── git_commands.vim      # commit, review, pr
 │       ├── arch_commands.vim     # plan, analyze
 │       ├── workflow_commands.vim # rename, optimize, debug, apply
-│       └── meta_commands.vim     # chat, context, model, version, doctor
+│       ├── meta_commands.vim     # chat, context, model, version, doctor
+│       └── diff.vim              # Diff preview display, polling, hook management
+├── bin/
+│   ├── vim-preview-diff.sh       # PreToolUse hook script
+│   ├── vim-close-diff.sh         # PostToolUse hook script
+│   └── apply-proposed.py         # Compute proposed file content
 ├── test/
 │   ├── vimrc                     # Minimal vimrc for test runner
 │   └── test_dispatch.vader       # Vader test suite
