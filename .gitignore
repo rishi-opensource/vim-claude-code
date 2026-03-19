@@ -1,6 +1,7 @@
 # Claude Code artifacts
 CLAUDE.md
 doc/AGENT_INSTRUCTIONS.md
+agent-instruction.md
 .claude/
 
 # Vim generated files
