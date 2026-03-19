@@ -14,7 +14,7 @@ def main():
 
     cwd = os.getcwd()
     claude_dir = os.path.join(cwd, ".claude", "tmp")
-    prefix = os.path.join(claude_dir, "vim-diff")
+    prefix = os.path.join(claude_dir, "claude-vim-diff")
     close_trigger = f"{prefix}-close"
 
     os.makedirs(claude_dir, exist_ok=True)

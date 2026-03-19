@@ -41,7 +41,7 @@ def main():
     claude_dir = os.path.join(cwd, ".claude", "tmp")
     os.makedirs(claude_dir, exist_ok=True)
     
-    prefix = os.path.join(claude_dir, "vim-diff")
+    prefix = os.path.join(claude_dir, "claude-vim-diff")
     orig_file = f"{prefix}-original"
     prop_file = f"{prefix}-proposed"
     trigger_file = f"{prefix}-trigger.json"
