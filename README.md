@@ -307,6 +307,10 @@ printed to the message area. Disable again with `let g:claude_code_debug = 0`.
 - Improved terminal/window handling
 - Floating window UI (Neovim)
 
+## Releases
+
+This project utilizes [semantic-release](https://github.com/semantic-release/semantic-release) for automated versioning and changelog generation. For details on how commit messages trigger releases, see [doc/RELEASING.md](doc/RELEASING.md).
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
