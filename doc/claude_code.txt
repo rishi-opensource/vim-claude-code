@@ -312,7 +312,7 @@ Default terminal keymaps (when |g:claude_code_map_keys| is 1):
 
   Terminal mode (inside the Claude window): ~
     <C-\>         Hide Claude Code terminal
-    <C-z>         Zoom Toggle: Maximize or restore terminal
+    <leader>z     Zoom Toggle: Maximize or restore terminal
     <C-h/j/k/l>   Navigate to adjacent window
 
 Extended keymaps (when g:claude_code_map_extended_keys is 1):
