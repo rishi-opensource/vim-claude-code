@@ -96,10 +96,8 @@ file is used.
 
                                                                     *:Claude*
 :Claude
-    Toggle the Claude Code terminal using a 3-stage rotation:
-    1. Hidden/Not Created -> Open in split
-    2. Visible in split  -> Zoom (maximize)
-    3. Visible and Zoomed -> Hide
+    Toggle the Claude Code terminal. Creates a new session on first use;
+    hides or restores an existing one on subsequent calls.
 
                                                            *:Claude-continue*
 :Claude continue
