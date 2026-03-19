@@ -29,7 +29,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 - Vim 8+ compiled with `+terminal`
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and in `$PATH`
 - Optional: `+popupwin` for floating window mode
-- Optional: `python3` and `jq` for diff preview (`:Claude preview`)
+- Optional: `python3` for diff preview (`:Claude preview`)
 
 ## Installation
 
@@ -136,7 +136,7 @@ Run a health check to verify your setup:
 
 When enabled, every time Claude proposes a file edit (Edit, Write, or MultiEdit), a side-by-side diff tab opens showing the **current** file on the left and the **proposed** changes on the right. Review the diff, then accept or reject in the Claude terminal. Press `q` to close the diff tab.
 
-Requires `python3` and `jq`. Optionally uses Vim `+clientserver` for instant diffs (falls back to file-based polling).
+Requires `python3`. Optionally uses Vim `+clientserver` for instant diffs (falls back to file-based polling).
 
 Auto-enable on startup:
 ```vim
@@ -271,9 +271,8 @@ vim-claude-code/
 │       ├── meta_commands.vim     # chat, context, model, version, doctor
 │       └── diff.vim              # Diff preview display, polling, hook management
 ├── bin/
-│   ├── vim-preview-diff.sh       # PreToolUse hook script
-│   ├── vim-close-diff.sh         # PostToolUse hook script
-│   └── apply-proposed.py         # Compute proposed file content
+│   ├── vim-preview-diff.py       # PreToolUse hook script computes proposed diffs
+│   └── vim-close-diff.py         # PostToolUse hook script
 ├── test/
 │   ├── vimrc                     # Minimal vimrc for test runner
 │   └── test_dispatch.vader       # Vader test suite

@@ -27,8 +27,10 @@ function! claude_code#diff#start_polling() abort
   if s:poll_timer >= 0
     return
   endif
-  let s:trigger_dir = substitute(exists('$TMPDIR') ? $TMPDIR : '/tmp', '/$', '', '')
-  let s:poll_timer = timer_start(300, function('s:check_trigger'), {'repeat': -1})
+  let l:git_root = claude_code#git#root()
+  let l:base = empty(l:git_root) ? getcwd() : l:git_root
+  let s:trigger_dir = l:base . '/.claude/tmp'
+  let s:poll_timer = timer_start(1000, function('s:check_trigger'), {'repeat': -1})
   call claude_code#util#debug('diff: polling started (' . s:trigger_dir . ')')
 endfunction
 
@@ -213,8 +215,8 @@ endfunction
 
 function! claude_code#diff#install_hooks() abort
   let l:bin = s:bin_dir()
-  let l:preview_script = l:bin . '/vim-preview-diff.sh'
-  let l:close_script = l:bin . '/vim-close-diff.sh'
+  let l:preview_script = l:bin . '/vim-preview-diff.py'
+  let l:close_script = l:bin . '/vim-close-diff.py'
 
   " Verify scripts exist
   if !filereadable(l:preview_script)
@@ -353,11 +355,7 @@ function! claude_code#diff#check_deps() abort
     call add(l:results, '[FAIL] python3 not found — required for diff preview')
   endif
 
-  if executable('jq')
-    call add(l:results, '[OK]   jq found')
-  else
-    call add(l:results, '[FAIL] jq not found — required for diff preview')
-  endif
+
 
   if has('clientserver')
     call add(l:results, '[OK]   +clientserver support (instant diff, optional)')

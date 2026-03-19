@@ -257,8 +257,7 @@ file is used.
     No argument defaults to "install".
 
     Requirements:
-    - python3 (for computing proposed file content)
-    - jq (for JSON processing in hook scripts)
+    - python3 (for parsing hook data and computing diff)
     - Optional: Vim +clientserver for instant diff (falls back to polling)
 
     Quick start: >
