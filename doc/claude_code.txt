@@ -96,9 +96,10 @@ file is used.
 
                                                                     *:Claude*
 :Claude
-    Toggle the Claude Code terminal. Creates a new session on first use;
-    hides or restores an existing one on subsequent calls.
-
+    Toggle the Claude Code terminal using a Smart Toggle flow:
+    1. If Hidden -> Show (or create new session)
+    2. If Visible but not focused -> Jump focus into the terminal
+    3. If Focused -> Hide the terminal
                                                            *:Claude-continue*
 :Claude continue
     Toggle with --continue (resumes the most recent conversation).
