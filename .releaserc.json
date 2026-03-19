@@ -1,5 +1,7 @@
 {
-  "branches": ["main"],
+  "branches": [
+    "main"
+  ],
   "plugins": [
     "@semantic-release/commit-analyzer",
     "@semantic-release/release-notes-generator",
@@ -13,7 +15,13 @@
     [
       "@semantic-release/git",
       {
-        "assets": ["CHANGELOG.md", "README.md", "doc/claude_code.txt"],
+        "assets": [
+          "CHANGELOG.md",
+          "README.md",
+          "doc/claude_code.txt",
+          "plugin/claude_code.vim",
+          "test/test_dispatch.vader"
+        ],
         "message": "chore(release): ${nextRelease.version} [skip ci]\n\n${nextRelease.notes}"
       }
     ],

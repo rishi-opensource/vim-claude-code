@@ -19,5 +19,12 @@ perl -pi -e "s/version-[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?-blue\.svg/versi
 # This replaces any instances of `vX.Y.Z` globally (git branch, tags, headers).
 perl -pi -e "s/v[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?/v${NEW_VERSION}/g" README.md
 
+# Update internal plugin version variable
+perl -pi -e "s/let g:claude_code_version = \"[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?\"/let g:claude_code_version = \"${NEW_VERSION}\"/g" plugin/claude_code.vim
+
+# Update Vader test suite to match the new version
+perl -pi -e "s/g:claude_code_version is set to [0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?/g:claude_code_version is set to ${NEW_VERSION}/g" test/test_dispatch.vader
+perl -pi -e "s/AssertEqual '[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.]+)?', g:claude_code_version/AssertEqual '${NEW_VERSION}', g:claude_code_version/g" test/test_dispatch.vader
+
 # Make sure we didn't inadvertently modify anything besides the semver strings!
-echo "Version successfully updated in README.md"
+echo "Version successfully updated across all files"
