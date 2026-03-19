@@ -21,7 +21,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 ![vim-claude-code highlight reel](assets/00-highlight-reel.gif)
 
 > **Key features in one clip** — toggle, fix, test generation, explain, git workflow, command discovery, and refactor.
-> See [DEMO.md](DEMO.md) for individual walkthroughs of other features.
+> See [DEMO.md](doc/DEMO.md) for individual walkthroughs of other features.
 
 ## Requirements
 
