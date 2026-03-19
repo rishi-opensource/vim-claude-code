@@ -118,54 +118,20 @@ endfunction
 " Default keymaps
 " ---------------------------------------------------------------------------
 
-if claude_code#config#get('map_keys')
-  let s:toggle_key = claude_code#config#get('map_toggle')
-  if !empty(s:toggle_key)
-    execute 'nnoremap <silent> ' . s:toggle_key . ' :Claude<CR>'
-    execute 'tnoremap <silent> ' . s:toggle_key . ' <C-\><C-n>:Claude<CR>'
-  endif
+" ---------------------------------------------------------------------------
+" Global keymaps initialization
+" ---------------------------------------------------------------------------
 
-  let s:cont_key = claude_code#config#get('map_continue')
-  if !empty(s:cont_key)
-    execute 'nnoremap <silent> ' . s:cont_key . ' :Claude continue<CR>'
-  endif
+" Initial setup of global keymaps. Run immediately to pick up any variables
+" set BEFORE the plugin was loaded.
+call claude_code#keymaps#setup_globals()
 
-  let s:verbose_key = claude_code#config#get('map_verbose')
-  if !empty(s:verbose_key)
-    execute 'nnoremap <silent> ' . s:verbose_key . ' :Claude verbose<CR>'
-  endif
-endif
-
-if claude_code#config#get('map_extended_keys')
-  let s:map_extended_prefix = claude_code#config#get('map_extended_prefix')
-  " Normal mode
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'e  :Claude explain<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'f  :Claude fix<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'r  :Claude refactor<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 't  :Claude test<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'd  :Claude doc<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'G  :Claude commit<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'R  :Claude review<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'p  :Claude pr<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'P  :Claude plan<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'a  :Claude analyze<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'n  :Claude rename<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'o  :Claude optimize<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'D  :Claude debug<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'A  :Claude apply<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'c  :Claude chat<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'x  :Claude context<CR>'
-  execute 'nnoremap <silent> ' . s:map_extended_prefix . 'm  :Claude model<CR>'
-
-  " Visual mode
-  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'e  :<C-u>Claude explain<CR>'
-  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'f  :<C-u>Claude fix<CR>'
-  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'r  :<C-u>Claude refactor<CR>'
-  execute 'xnoremap <silent> ' . s:map_extended_prefix . 't  :<C-u>Claude test<CR>'
-  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'd  :<C-u>Claude doc<CR>'
-  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'n  :<C-u>Claude rename<CR>'
-  execute 'xnoremap <silent> ' . s:map_extended_prefix . 'o  :<C-u>Claude optimize<CR>'
-endif
+" Also run on VimEnter to pick up any variables set AFTER the plugin was
+" loaded (e.g. at the bottom of .vimrc).
+augroup ClaudeCodeGlobalMaps
+  autocmd!
+  autocmd VimEnter * call claude_code#keymaps#setup_globals()
+augroup END
 
 " ---------------------------------------------------------------------------
 " :Claude preview — diff preview sub-commands
