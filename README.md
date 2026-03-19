@@ -169,7 +169,7 @@ let g:claude_code_diff_preview = 1
 | Normal | `<Leader>cC` | Toggle with `--continue` |
 | Normal | `<Leader>cV` | Toggle with `--verbose` |
 | Terminal | `<C-\>` | Hide Claude Code terminal |
-| Terminal | `<leader>z` | **Zoom Toggle**: Maximize or restore terminal |
+| Terminal | `<C-w>z` | **Zoom Toggle**: Maximize or restore terminal |
 | Terminal | `<C-h/j/k/l>` | Navigate to adjacent window |
 
 ### Extended keymaps (`g:claude_code_map_extended_prefix` + key)
