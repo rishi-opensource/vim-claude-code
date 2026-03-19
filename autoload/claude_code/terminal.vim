@@ -18,10 +18,10 @@ let s:pending_variant = ''
 " ---------------------------------------------------------------------------
 
 " Toggle the Claude Code terminal, optionally with a subcommand variant.
-" If a terminal for the current instance exists and is visible, hide it.
-" If it exists but is hidden, show it. Otherwise create a new one.
-" When a variant name is given (e.g. 'continue'), the corresponding CLI
-" flag is appended on first creation only.
+" implements a 3-stage state machine:
+" 1. Hidden/Not Created -> Open in split
+" 2. Visible in split  -> Zoom (maximize)
+" 3. Visible and Zoomed -> Hide
 function! claude_code#terminal#toggle(...) abort
   let l:variant_name = a:0 ? a:1 : ''
   call claude_code#util#debug('terminal#toggle variant=' . l:variant_name)
@@ -42,11 +42,26 @@ function! claude_code#terminal#toggle(...) abort
 
   if l:bufnr > 0 && s:is_valid(l:bufnr)
     if s:is_visible(l:bufnr)
-      call claude_code#window#close_buf_windows(l:bufnr)
+      " If it's already visible, check if it's in the CURRENT tab.
+      if index(tabpagebuflist(), l:bufnr) >= 0
+        " Toggle between Split -> Zoom -> Hide
+        if get(t:, 'claude_code_zoomed', 0)
+          " Stage 3: Hide everything for this instance
+          call claude_code#window#close_buf_windows(l:bufnr)
+        else
+          " Stage 2: Zoom it
+          call claude_code#terminal#zoom()
+        endif
+      else
+        " Not in current tab, so show it here (Stage 1)
+        call s:show_existing(l:bufnr)
+      endif
     else
+      " Stage 1: Exists but hidden
       call s:show_existing(l:bufnr)
     endif
   else
+    " Stage 1: Not created
     if !empty(l:flag)
       let s:pending_variant = l:flag
     endif
