@@ -44,7 +44,7 @@ function! s:complete(ArgLead, CmdLine, CursorPos) abort
         \ 'rename', 'optimize', 'debug', 'apply',
         \ 'chat', 'context', 'model',
         \ 'version', 'doctor',
-        \ 'preview',
+        \ 'preview', 'zoom',
         \ ]
   return filter(copy(l:subs), 'v:val =~# "^" . a:ArgLead')
 endfunction
@@ -107,6 +107,8 @@ function! s:dispatch(args) abort
     call claude_code#meta_commands#doctor()
   elseif l:sub ==# 'preview'
     call s:dispatch_preview(l:flags)
+  elseif l:sub ==# 'zoom'
+    call claude_code#terminal#zoom()
   else
     call claude_code#util#error('vim-claude-code: unknown sub-command "' . l:sub . '". Try :Claude <Tab>')
   endif

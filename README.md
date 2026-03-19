@@ -133,6 +133,7 @@ Run a health check to verify your setup:
 | `:Claude preview uninstall` | Remove diff preview hooks |
 | `:Claude preview close` | Manually close an open diff tab |
 | `:Claude preview status` | Show diff preview status and dependency checks |
+| `:Claude zoom` | Toggle full-screen (zoom) mode for the terminal |
 
 When enabled, every time Claude proposes a file edit (Edit, Write, or MultiEdit), a side-by-side diff tab opens showing the **current** file on the left and the **proposed** changes on the right. Review the diff, then accept or reject in the Claude terminal. Press `q` to close the diff tab.
 
@@ -168,6 +169,7 @@ let g:claude_code_diff_preview = 1
 | Normal | `<Leader>cC` | Toggle with `--continue` |
 | Normal | `<Leader>cV` | Toggle with `--verbose` |
 | Terminal | `<C-\>` | Hide Claude Code terminal |
+| Terminal | `<C-z>` | **Zoom Toggle**: Maximize or restore terminal |
 | Terminal | `<C-h/j/k/l>` | Navigate to adjacent window |
 
 ### Extended keymaps (`g:claude_code_map_extended_prefix` + key)

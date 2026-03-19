@@ -55,6 +55,50 @@ function! claude_code#terminal#toggle(...) abort
   endif
 endfunction
 
+" Toggle the zoomed (maximized) state of the current Claude terminal.
+" Uses a temporary tab to provide a full-screen view without losing context.
+function! claude_code#terminal#zoom() abort
+  if get(t:, 'claude_code_zoomed', 0)
+    " We are in a zoomed tab, so just close it to return.
+    tabclose
+    return
+  endif
+
+  let l:bufnr = bufnr('%')
+  let l:id = s:get_instance_id()
+  let l:instance_buf = get(s:instances, l:id, -1)
+
+  if l:bufnr != l:instance_buf
+    " If we are not in the terminal window, try to jump to it first.
+    if l:instance_buf > 0 && s:is_valid(l:instance_buf)
+      let l:win_ids = win_findbuf(l:instance_buf)
+      if !empty(l:win_ids)
+        call win_gotoid(l:win_ids[0])
+        let l:bufnr = l:instance_buf
+      else
+        " It's hidden, show it first normally.
+        call s:show_existing(l:instance_buf)
+        let l:bufnr = l:instance_buf
+      endif
+    endif
+  endif
+
+  if l:bufnr > 0 && s:is_valid(l:bufnr)
+    " Maximize by opening the buffer in a new tab.
+    execute 'tab split'
+    let t:claude_code_zoomed = 1
+    call s:configure_term_window()
+    " Ensure we stay in terminal mode if inserts are enabled.
+    if claude_code#config#get('enter_insert')
+      if mode() !=# 't'
+        silent! normal! i
+      endif
+    endif
+  else
+    call claude_code#util#error('claude-code: no active terminal to zoom')
+  endif
+endfunction
+
 " ---------------------------------------------------------------------------
 " Internal helpers
 " ---------------------------------------------------------------------------

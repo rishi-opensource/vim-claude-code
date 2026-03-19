@@ -111,6 +111,12 @@ file is used.
 :Claude verbose
     Toggle with --verbose (enables detailed Claude Code logging).
 
+                                                              *:Claude-zoom*
+:Claude zoom
+    Toggle the zoomed (maximized) state of the current Claude terminal.
+    Uses a temporary tab to provide a full-screen view without losing
+    the terminal context. Restore the original split by zooming again.
+
 ------------------------------------------------------------------------------
 5.2 Code Intelligence                                    *claude-code-intel*
 
@@ -306,6 +312,7 @@ Default terminal keymaps (when |g:claude_code_map_keys| is 1):
 
   Terminal mode (inside the Claude window): ~
     <C-\>         Hide Claude Code terminal
+    <C-z>         Zoom Toggle: Maximize or restore terminal
     <C-h/j/k/l>   Navigate to adjacent window
 
 Extended keymaps (when g:claude_code_map_extended_keys is 1):
