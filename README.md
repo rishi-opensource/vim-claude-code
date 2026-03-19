@@ -234,6 +234,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_map_keys` | `1` | Register default toggle keymaps |
 | `g:claude_code_map_extended_keys` | `1` | Register `<Leader>c*` keymaps |
 | `g:claude_code_map_toggle` | `'<C-\>'` | Toggle key |
+| `g:claude_code_map_zoom` | `'<C-w>z'` | Zoom key |
 | `g:claude_code_map_continue` | `'<Leader>cC'` | Continue key |
 | `g:claude_code_map_verbose` | `'<Leader>cV'` | Verbose key |
 | `g:claude_code_map_extended_prefix` | `'<Leader>c'` | Prefix for all extended keymaps |

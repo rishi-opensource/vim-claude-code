@@ -420,6 +420,10 @@ g:claude_code_map_extended_keys   Default: 1
 g:claude_code_map_toggle          Default: '<C-\>'
     Key to toggle the terminal (normal + terminal mode).
 
+                                                 *g:claude_code_map_zoom*
+g:claude_code_map_zoom            Default: '<C-w>z'
+    Key to toggle the zoomed (maximized) state.
+
                                               *g:claude_code_map_continue*
 g:claude_code_map_continue        Default: '<Leader>cC'
     Key to toggle with --continue.

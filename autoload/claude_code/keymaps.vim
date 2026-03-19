@@ -17,7 +17,7 @@ function! claude_code#keymaps#setup_terminal(bufnr) abort
   execute 'tnoremap <buffer> <silent> <C-j> <C-\><C-n><C-w>j'
   execute 'tnoremap <buffer> <silent> <C-k> <C-\><C-n><C-w>k'
   execute 'tnoremap <buffer> <silent> <C-l> <C-\><C-n><C-w>l'
-  execute 'tnoremap <buffer> <silent> <C-w>z <C-\><C-n>:Claude zoom<CR>'
+  execute 'tnoremap <buffer> <silent> ' . claude_code#config#get('map_zoom') . ' <C-\><C-n>:Claude zoom<CR>'
 
   " Mouse/touchpad scroll in terminal mode: escape to Normal, scroll, stay in
   " Normal so the user can keep reading.  Vim passes raw ScrollWheel events
@@ -40,7 +40,7 @@ function! claude_code#keymaps#setup_terminal(bufnr) abort
   execute 'nnoremap <buffer> <silent> <C-j> <C-w>j'
   execute 'nnoremap <buffer> <silent> <C-k> <C-w>k'
   execute 'nnoremap <buffer> <silent> <C-l> <C-w>l'
-  execute 'nnoremap <buffer> <silent> <C-w>z :Claude zoom<CR>'
+  execute 'nnoremap <buffer> <silent> ' . claude_code#config#get('map_zoom') . ' :Claude zoom<CR>'
 
   " Autocommand to re-enter terminal mode when switching INTO the Claude window
   " from another window.  Uses WinEnter only (not BufEnter) so that the user

@@ -33,6 +33,7 @@ let s:defaults = {
       \ 'map_toggle':         '<C-\>',
       \ 'map_continue':       '<Leader>cC',
       \ 'map_verbose':        '<Leader>cV',
+      \ 'map_zoom':           '<C-w>z',
       \ 'debug':              0,
       \ 'terminal_start_delay': 300,
       \ 'scroll_keys':           1,
