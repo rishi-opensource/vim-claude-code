@@ -134,6 +134,11 @@ if claude_code#config#get('map_keys')
   if !empty(s:verbose_key)
     execute 'nnoremap <silent> ' . s:verbose_key . ' :Claude verbose<CR>'
   endif
+
+  let s:zoom_key = claude_code#config#get('map_zoom')
+  if !empty(s:zoom_key)
+    execute 'nnoremap <silent> ' . s:zoom_key . ' :Claude zoom<CR>'
+  endif
 endif
 
 if claude_code#config#get('map_extended_keys')
