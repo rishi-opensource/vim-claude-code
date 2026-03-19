@@ -165,10 +165,10 @@ let g:claude_code_diff_preview = 1
 
 | Mode | Key | Action |
 |---|---|---|
-| Normal | `<C-\>` | **Smart Toggle**: Open / Focus / Hide |
+| Normal | `<C-\>` | Toggle Claude Code terminal |
 | Normal | `<Leader>cC` | Toggle with `--continue` |
 | Normal | `<Leader>cV` | Toggle with `--verbose` |
-| Terminal | `<C-\>` | **Smart Toggle**: Open / Focus / Hide |
+| Terminal | `<C-\>` | Hide Claude Code terminal |
 | Terminal | `<C-w>z` | **Zoom Toggle**: Maximize or restore terminal |
 | Terminal | `<C-h/j/k/l>` | Navigate to adjacent window |
 

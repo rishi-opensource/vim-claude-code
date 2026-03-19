@@ -18,10 +18,10 @@ let s:pending_variant = ''
 " ---------------------------------------------------------------------------
 
 " Toggle the Claude Code terminal, optionally with a subcommand variant.
-" Implements "Smart Toggle" behavior:
-" 1. If Hidden -> Show existing (or create new)
-" 2. If Visible but not focused -> Jump focus into the terminal
-" 3. If Focused -> Hide the terminal
+" If a terminal for the current instance exists and is visible, hide it.
+" If it exists but is hidden, show it. Otherwise create a new one.
+" When a variant name is given (e.g. 'continue'), the corresponding CLI
+" flag is appended on first creation only.
 function! claude_code#terminal#toggle(...) abort
   let l:variant_name = a:0 ? a:1 : ''
   call claude_code#util#debug('terminal#toggle variant=' . l:variant_name)
@@ -42,27 +42,11 @@ function! claude_code#terminal#toggle(...) abort
 
   if l:bufnr > 0 && s:is_valid(l:bufnr)
     if s:is_visible(l:bufnr)
-      " If it's already visible, check if we are currently IN it.
-      if bufnr('%') == l:bufnr
-        " We are already in it: HIDE.
-        call claude_code#window#close_buf_windows(l:bufnr)
-      else
-        " It's visible elsewhere: JUMP to it.
-        let l:win_ids = win_findbuf(l:bufnr)
-        if !empty(l:win_ids)
-          call win_gotoid(l:win_ids[0])
-          " Ensure we enter insert mode if configured.
-          if claude_code#config#get('enter_insert') && mode() !=# 't'
-            silent! normal! i
-          endif
-        endif
-      endif
+      call claude_code#window#close_buf_windows(l:bufnr)
     else
-      " It exists but is hidden: SHOW.
       call s:show_existing(l:bufnr)
     endif
   else
-    " Not created: CREATE.
     if !empty(l:flag)
       let s:pending_variant = l:flag
     endif
