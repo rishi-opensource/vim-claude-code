@@ -178,7 +178,7 @@ The Claude session persists — toggling with `<C-\>` hides and restores the sam
 
 ## Reviewing Claude's Edits — Diff Preview
 
-![diff preview demo](assets/12-auto-refresh.gif)
+![diff preview demo](assets/16-diff-preview.gif)
 
 When Claude proposes changes to a file, a **side-by-side diff tab opens automatically** before anything is written to disk:
 
@@ -211,7 +211,7 @@ Requires `python3`. Uses Vim `+clientserver` for instant diffs when available, f
 
 ## Full-Screen Focus — Terminal Zoom
 
-![zoom demo](assets/08-window-layouts.gif)
+![zoom demo](assets/17-terminal-zoom.gif)
 
 Working through a complex problem? Press `<C-w>z` inside the Claude terminal to **maximize it full-screen** — just like tmux's zoom. Press again to restore your split layout.
 
