@@ -3,26 +3,48 @@
 [![CI](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml/badge.svg)](https://github.com/rishi-opensource/vim-claude-code/actions/workflows/ci.yml)
 [![Version](https://img.shields.io/badge/version-1.4.0-blue.svg)](CHANGELOG.md)
 
-A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/docs/claude-code) CLI directly into your editor. Run Claude Code in a managed terminal, send code context with a single keystroke, and get automatic file reloading when Claude edits your files — all without leaving Vim.
+**AI-powered coding, inside Vim. No context switching.**
 
-## Features
+`vim-claude-code` brings [Claude Code](https://docs.anthropic.com/en/docs/claude-code) directly into your editor. Fix bugs, write tests, review diffs, generate commits, and refactor code — all without leaving Vim.
 
-- **One-key toggle** — Open and close Claude Code with `<C-\>`
-- **22 sub-commands** — Explain, fix, refactor, test, document, commit, review, and more
-- **Selection-aware** — Commands use visual selection when active, otherwise detect the current function
-- **Multiple window layouts** — Right split (default), bottom split, top split, floating popup, or dedicated tab
-- **Automatic file refresh** — Buffers reload when Claude modifies files on disk
-- **Git-aware** — Starts Claude at the repository root; separate sessions per repo
-- **Diff preview** — Side-by-side diff tab when Claude proposes file edits (Edit, Write, MultiEdit)
-- **Health check** — `:Claude doctor` verifies your environment before you start
-- **Configurable** — 20+ `g:` variables with buffer-local overrides
+One keypress opens Claude in a split panel. Another hides it. Your session persists across toggles. Claude edits your files; your buffers reload automatically. You stay in flow.
+
+## Why vim-claude-code?
+
+Most AI coding tools pull you out of your editor — into a browser, a chat window, or a separate terminal. `vim-claude-code` keeps everything inside Vim:
+
+- **No copy-pasting** — commands automatically capture your visual selection or current function
+- **No tab switching** — Claude runs in a managed split, toggled with a single key
+- **No blind edits** — every file change Claude proposes shows up as a reviewable diff before anything is written to disk
+- **No workflow interruption** — buffers reload automatically when Claude modifies files
 
 ## Demos
 
 ![vim-claude-code highlight reel](assets/00-highlight-reel.gif)
 
-> **Key features in one clip** — toggle, fix, test generation, explain, git workflow, command discovery, and refactor.
-> See [DEMO.md](doc/DEMO.md) for individual walkthroughs of other features.
+> Toggle, fix bugs, generate tests, explain code, run git workflows, and refactor — all from within Vim.
+> See [DEMO.md](doc/DEMO.md) for individual feature walkthroughs.
+
+## Features at a Glance
+
+### Stay in Flow
+- **One-key toggle** — `<C-\>` opens and hides Claude. Session persists across toggles.
+- **Terminal Zoom** — Maximize Claude to full-screen with `<C-w>z`, tmux-style. Restore your split instantly.
+- **Auto file refresh** — Buffers reload when Claude edits your files. No manual `:e` needed.
+- **Multiple layouts** — Right split (default), bottom, top, left, floating popup, or dedicated tab.
+
+### Context-Aware Commands
+- **Selection-aware** — Commands use your visual selection when active, otherwise detect the current function automatically.
+- **22 sub-commands** — Explain, fix, refactor, test, document, commit, review, rename, optimize, debug, and more. All tab-completable.
+- **Git-aware** — Claude starts at your repo root. Separate sessions per repository.
+
+### Review Before Claude Writes
+- **Diff preview** — Every file edit Claude proposes opens a side-by-side diff tab. Review what changes, then accept or reject. You stay in control.
+
+### Full Git Workflow
+- **Commit messages** — Generated from your staged diff, with conventional commit support.
+- **Code review** — Claude reviews your current diff with configurable strictness and security checks.
+- **PR descriptions** — Generated from your branch changes without leaving the editor.
 
 ## Requirements
 
@@ -34,8 +56,7 @@ A Vim plugin that integrates the [Claude Code](https://docs.anthropic.com/en/doc
 ## Installation
 
 > **Stable release — v1.4.0**
-> Pin to the latest stable release using the examples below, or omit the tag
-> to always track the latest commit on `main`.
+> Pin to the latest stable release using the examples below, or omit the tag to always track `main`.
 
 ### [vim-plug](https://github.com/junegunn/vim-plug)
 ```vim
@@ -57,32 +78,41 @@ Plugin 'rishi-opensource/vim-claude-code'
 
 ### [pathogen](https://github.com/tpope/vim-pathogen)
 ```sh
-git clone --branch v1.4.0 https://github.com/rishi-opensource/vim-claude-code.git
+git clone --branch v1.4.0 https://github.com/rishi-opensource/vim-claude-code.git ~/.vim/bundle/vim-claude-code
 ```
 
 ### Native packages (Vim 8+)
 ```sh
 mkdir -p ~/.vim/pack/plugins/start
-git clone --branch v1.4.0 https://github.com/rishi-opensource/vim-claude-code.git
+git clone --branch v1.4.0 https://github.com/rishi-opensource/vim-claude-code.git ~/.vim/pack/plugins/start/vim-claude-code
 ```
 
 ## Quick Start
 
-Run `:Claude` or press `<C-\>` to open Claude Code. Press it again to hide; again to restore. The session persists.
-
-All sub-commands are tab-completable:
+**1. Open Claude:**
+```vim
+:Claude
+" or press <C-\>
 ```
-:Claude <Tab>
-```
 
-Run a health check to verify your setup:
+**2. Run a health check:**
 ```vim
 :Claude doctor
 ```
+This reports `[OK]` / `[FAIL]` for every dependency and tells you exactly what to fix.
+
+**3. Explore commands with tab completion:**
+```vim
+:Claude <Tab>
+```
+
+The Claude session persists — toggling with `<C-\>` hides and restores the same session.
 
 ## Commands
 
 ### Terminal
+
+*Open, hide, and manage the Claude terminal session.*
 
 | Command | Description |
 |---|---|
@@ -93,6 +123,8 @@ Run a health check to verify your setup:
 
 ### Code Intelligence
 
+*Commands work on your visual selection when active, or auto-detect the current function.*
+
 | Command | Flags | Description |
 |---|---|---|
 | `:Claude explain` | `--brief`, `--detailed` | Explain selected code or current function |
@@ -101,7 +133,9 @@ Run a health check to verify your setup:
 | `:Claude test` | `--framework {name}`, `--edge-cases` | Generate unit tests |
 | `:Claude doc` | `--inline`, `--markdown` | Generate documentation |
 
-### Git
+### Git Workflow
+
+*From staged diff to commit message to PR description — without opening a browser.*
 
 | Command | Flags | Description |
 |---|---|---|
@@ -111,38 +145,21 @@ Run a health check to verify your setup:
 
 ### Architecture & Planning
 
+*Think through larger problems with Claude before writing code.*
+
 | Command | Description |
 |---|---|
-| `:Claude plan` | Generate implementation plan for current file |
-| `:Claude analyze` | Analyze for complexity, performance, and security |
+| `:Claude plan` | Generate an implementation plan for the current file |
+| `:Claude analyze` | Analyze for complexity, performance, and security issues |
 
-### Workflow
+### Workflow Utilities
 
 | Command | Description |
 |---|---|
 | `:Claude rename` | Suggest better variable/function names |
 | `:Claude optimize` | Optimize code for performance |
-| `:Claude debug` | Analyze error on current line |
+| `:Claude debug` | Analyze the error on the current line |
 | `:Claude apply` | Apply Claude's last suggestion to the file (prompts for confirmation) |
-
-### Diff Preview
-
-| Command | Description |
-|---|---|
-| `:Claude preview install` | Register diff preview hooks in `.claude/settings.local.json` |
-| `:Claude preview uninstall` | Remove diff preview hooks |
-| `:Claude preview close` | Manually close an open diff tab |
-| `:Claude preview status` | Show diff preview status and dependency checks |
-| `:Claude zoom` | Toggle full-screen (zoom) mode for the terminal |
-
-When enabled, every time Claude proposes a file edit (Edit, Write, or MultiEdit), a side-by-side diff tab opens showing the **current** file on the left and the **proposed** changes on the right. Review the diff, then accept or reject in the Claude terminal. Press `q` to close the diff tab.
-
-Requires `python3`. Optionally uses Vim `+clientserver` for instant diffs (falls back to file-based polling).
-
-Auto-enable on startup:
-```vim
-let g:claude_code_diff_preview = 1
-```
 
 ### Meta
 
@@ -158,6 +175,52 @@ let g:claude_code_diff_preview = 1
 |---|---|
 | `:Claude version` | Show plugin version, Vim version, Claude CLI version, and terminal support |
 | `:Claude doctor` | Health check: verifies Claude CLI, Git, terminal support, and Vim version |
+
+## Reviewing Claude's Edits — Diff Preview
+
+![diff preview demo](assets/12-auto-refresh.gif)
+
+When Claude proposes changes to a file, a **side-by-side diff tab opens automatically** before anything is written to disk:
+
+```
+  [current file]    │    [proposed changes]
+```
+
+Review exactly what Claude wants to change. Then accept or reject it directly in the Claude terminal. Press `q` to close the diff tab.
+
+**Enable diff preview for your project:**
+```vim
+:Claude preview install
+```
+
+This registers Claude Code hooks in `.claude/settings.local.json`. To auto-enable on every Vim startup:
+```vim
+let g:claude_code_diff_preview = 1
+```
+
+**Diff preview commands:**
+
+| Command | Description |
+|---|---|
+| `:Claude preview install` | Register diff preview hooks in `.claude/settings.local.json` |
+| `:Claude preview uninstall` | Remove diff preview hooks |
+| `:Claude preview close` | Manually close an open diff tab |
+| `:Claude preview status` | Show diff preview status and dependency checks |
+
+Requires `python3`. Uses Vim `+clientserver` for instant diffs when available, falls back to polling.
+
+## Full-Screen Focus — Terminal Zoom
+
+![zoom demo](assets/08-window-layouts.gif)
+
+Working through a complex problem? Press `<C-w>z` inside the Claude terminal to **maximize it full-screen** — just like tmux's zoom. Press again to restore your split layout.
+
+This is especially useful when Claude is generating a long response and you want to read it without distractions.
+
+```vim
+" Customize the zoom key
+let g:claude_code_map_zoom = '<C-w>z'
+```
 
 ## Keymaps
 
@@ -194,21 +257,21 @@ let g:claude_code_map_keys = 0
 let g:claude_code_map_extended_keys = 0
 ```
 
-## Window Modes
+## Window Layouts
 
-Set `g:claude_code_position` to one of:
+Set `g:claude_code_position` to match your preferred workflow:
 
 | Value | Layout |
 |---|---|
+| `'right'` | Vertical split on the right (default) |
 | `'bottom'` | Horizontal split at the bottom |
 | `'top'` | Horizontal split at the top |
 | `'left'` | Vertical split on the left |
-| `'right'` | Vertical split on the right (default) |
 | `'float'` | Floating popup (requires `+popupwin`) |
 | `'tab'` | Dedicated tab page |
 
 ```vim
-" Bottom split at 30% (override the default right split)
+" Bottom split at 30%
 let g:claude_code_position   = 'bottom'
 let g:claude_code_split_ratio = 0.3
 
@@ -251,47 +314,6 @@ let g:claude_code_float_border = 'double'
 
 Buffer-local `b:claude_code_*` overrides take precedence over `g:` variables.
 
-## Plugin Structure
-
-```
-vim-claude-code/
-├── plugin/
-│   └── claude_code.vim           # Entry point: command + keymaps
-├── autoload/
-│   └── claude_code/
-│       ├── config.vim            # Configuration defaults + get/set
-│       ├── terminal.vim          # Terminal lifecycle (create/toggle/close)
-│       ├── terminal_bridge.vim   # Terminal lookup and prompt dispatch
-│       ├── window.vim            # Window layout utilities
-│       ├── git.vim               # Git root detection with caching
-│       ├── keymaps.vim           # Terminal-local keymaps
-│       ├── refresh.vim           # File change detection and reload
-│       ├── util.vim              # Shared helpers (selection, context, error, debug)
-│       ├── commands.vim          # explain, fix, refactor, test, doc
-│       ├── git_commands.vim      # commit, review, pr
-│       ├── arch_commands.vim     # plan, analyze
-│       ├── workflow_commands.vim # rename, optimize, debug, apply
-│       ├── meta_commands.vim     # chat, context, model, version, doctor
-│       └── diff.vim              # Diff preview display, polling, hook management
-├── bin/
-│   ├── vim-preview-diff.py       # PreToolUse hook script computes proposed diffs
-│   └── vim-close-diff.py         # PostToolUse hook script
-├── test/
-│   ├── vimrc                     # Minimal vimrc for test runner
-│   └── test_dispatch.vader       # Vader test suite
-├── .github/
-│   └── workflows/
-│       └── ci.yml                # GitHub Actions CI (Vim 8 + Vim 9)
-└── doc/
-    └── claude_code.txt           # :help documentation
-```
-
-## Help
-
-```vim
-:help claude-code
-```
-
 ## Troubleshooting
 
 **Run the health check first:**
@@ -302,42 +324,43 @@ This reports `[OK]` / `[FAIL]` for each dependency and tells you exactly what to
 
 ---
 
-**E117: Unknown function** — Run `:helptags ALL` then restart Vim. Ensure the
-plugin directory is on your `runtimepath`.
+**E117: Unknown function** — Run `:helptags ALL` then restart Vim. Ensure the plugin directory is on your `runtimepath`.
 
-**Terminal does not open** — Verify `vim --version | grep +terminal`. The plugin
-requires Vim compiled with `+terminal`. Run `:Claude doctor` to confirm.
+**Terminal does not open** — Verify `vim --version | grep +terminal`. The plugin requires Vim compiled with `+terminal`.
 
-**Claude not found** — Ensure `claude` is in `$PATH`: `which claude`. Run
-`:Claude doctor` to confirm.
+**Claude not found** — Ensure `claude` is in `$PATH`: `which claude`.
 
-**File changes not detected** — Check `g:claude_code_refresh_enable` is `1` and
-that `autoread` is not globally disabled in your vimrc.
+**File changes not detected** — Check `g:claude_code_refresh_enable` is `1` and that `autoread` is not globally disabled in your vimrc.
 
 **Debug logging** — Enable verbose output to diagnose issues:
 ```vim
 let g:claude_code_debug = 1
 ```
-All internal events (dispatch, terminal launch, git calls, refresh) will be
-printed to the message area. Disable again with `let g:claude_code_debug = 0`.
+All internal events (dispatch, terminal launch, git calls, refresh) will be printed to the message area.
+
+## Help
+
+```vim
+:help claude-code
+```
 
 ## 🚧 Roadmap
 
 ### v1.x
-
 - UX improvements and workflow refinements
-- Add more intelligent `:Claude` subcommands
-- Improve diagnostics and configuration options
+- Additional intelligent `:Claude` subcommands
+- Improved diagnostics and configuration options
 
 ### v2.0
-
 - Official Neovim support
 - Improved terminal/window handling
 - Floating window UI (Neovim)
 
+Neovim support is planned for v2.0. Contributions are welcome — open an issue or PR on [GitHub](https://github.com/rishi-opensource/vim-claude-code).
+
 ## Releases
 
-This project utilizes [semantic-release](https://github.com/semantic-release/semantic-release) for automated versioning and changelog generation. For details on how commit messages trigger releases, see [doc/RELEASING.md](doc/RELEASING.md).
+This project uses [semantic-release](https://github.com/semantic-release/semantic-release) for automated versioning and changelog generation. See [doc/RELEASING.md](doc/RELEASING.md) for details.
 
 ## License
 
