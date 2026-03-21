@@ -160,6 +160,7 @@ The Claude session persists — toggling with `<C-\>` hides and restores the sam
 | `:Claude optimize` | Optimize code for performance |
 | `:Claude debug` | Analyze the error on the current line |
 | `:Claude apply` | Apply Claude's last suggestion to the file (prompts for confirmation) |
+| `:Claude zoom` | Toggle full-screen (zoom) mode for the Claude terminal |
 
 ### Meta
 
@@ -186,7 +187,13 @@ When Claude proposes changes to a file, a **side-by-side diff tab opens automati
   [current file]    │    [proposed changes]
 ```
 
-Review exactly what Claude wants to change. Then accept or reject it directly in the Claude terminal. Press `q` to close the diff tab.
+Review exactly what Claude wants to change, then use these keys in the diff tab:
+
+| Key | Action |
+|---|---|
+| `ga` | Accept — send `y` to Claude, apply the change |
+| `gr` | Reject — send `n` to Claude, discard the change |
+| `q` | Close the diff tab without responding |
 
 **Enable diff preview for your project:**
 ```vim
