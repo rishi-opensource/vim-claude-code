@@ -22,7 +22,7 @@ Most AI coding tools pull you out of your editor — into a browser, a chat wind
 
 ![vim-claude-code highlight reel](assets/00-highlight-reel.gif)
 
-> Toggle, fix bugs, generate tests, explain code, run git workflows, and refactor — all from within Vim.
+> Toggle, fix bugs, generate tests, explain code, git workflows, diff preview, terminal zoom, and more — all from within Vim.
 > See [DEMO.md](doc/DEMO.md) for individual feature walkthroughs.
 
 ## Features at a Glance
@@ -153,6 +153,8 @@ The Claude session persists — toggling with `<C-\>` hides and restores the sam
 | `:Claude analyze` | Analyze for complexity, performance, and security issues |
 
 ### Workflow Utilities
+
+*Direct in-editor actions — apply suggestions, debug errors, rename symbols, or zoom the terminal.*
 
 | Command | Description |
 |---|---|
@@ -345,29 +347,7 @@ let g:claude_code_debug = 1
 ```
 All internal events (dispatch, terminal launch, git calls, refresh) will be printed to the message area.
 
-## Help
-
-```vim
-:help claude-code
-```
-
-## 🚧 Roadmap
-
-### v1.x
-- UX improvements and workflow refinements
-- Additional intelligent `:Claude` subcommands
-- Improved diagnostics and configuration options
-
-### v2.0
-- Official Neovim support
-- Improved terminal/window handling
-- Floating window UI (Neovim)
-
-Neovim support is planned for v2.0. Contributions are welcome — open an issue or PR on [GitHub](https://github.com/rishi-opensource/vim-claude-code).
-
-## Releases
-
-This project uses [semantic-release](https://github.com/semantic-release/semantic-release) for automated versioning and changelog generation. See [doc/RELEASING.md](doc/RELEASING.md) for details.
+For full in-editor documentation, run `:help claude-code`.
 
 ## License
 
@@ -375,4 +355,4 @@ MIT — see [LICENSE](LICENSE).
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for full details.
+See [CHANGELOG.md](CHANGELOG.md) for full details. This project uses [semantic-release](https://github.com/semantic-release/semantic-release) for automated versioning. See [doc/RELEASING.md](doc/RELEASING.md) for details.
