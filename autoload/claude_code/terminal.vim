@@ -142,6 +142,26 @@ function! s:build_command(instance_id) abort
   return l:cmd
 endfunction
 
+" Paste from system clipboard into the terminal buffer.
+" Bypasses terminal mappings using term_sendkeys().
+function! claude_code#terminal#paste() abort
+  let l:bnr = bufnr('%')
+  if getbufvar(l:bnr, '&buftype') !=# 'terminal'
+    return
+  endif
+
+  " Use + register (system clipboard) if available, fallback to * or default.
+  let l:reg = has('clipboard') ? '+' : '"'
+  let l:text = getreg(l:reg)
+  if empty(l:text) && l:reg == '+'
+    let l:text = getreg('*')
+  endif
+
+  if !empty(l:text)
+    call term_sendkeys(l:bnr, l:text)
+  endif
+endfunction
+
 " Create a brand-new Claude Code terminal.
 function! s:create_new(instance_id) abort
   call claude_code#util#debug('terminal: creating new instance for ' . a:instance_id)

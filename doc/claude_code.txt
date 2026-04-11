@@ -313,6 +313,7 @@ Default terminal keymaps (when |g:claude_code_map_keys| is 1):
   Terminal mode (inside the Claude window): ~
     <C-\>         Hide Claude Code terminal
     <C-w>z        Zoom Toggle: Maximize or restore terminal
+    <C-v>         Paste: Paste system clipboard content
     <C-h/j/k/l>   Navigate to adjacent window
 
 Extended keymaps (when g:claude_code_map_extended_keys is 1):
@@ -423,6 +424,11 @@ g:claude_code_map_toggle          Default: '<C-\>'
                                                  *g:claude_code_map_zoom*
 g:claude_code_map_zoom            Default: '<C-w>z'
     Key to toggle the zoomed (maximized) state.
+    
+                                                  *g:claude_code_map_paste*
+g:claude_code_map_paste           Default: '<C-v>'
+    Key to paste text from the system clipboard into the terminal.
+    Bypasses terminal mappings using |term_sendkeys()|.
 
                                               *g:claude_code_map_continue*
 g:claude_code_map_continue        Default: '<Leader>cC'
@@ -477,6 +483,11 @@ g:claude_code_diff_preview           Default: 0
     register the hooks. >
         let g:claude_code_diff_preview = 1
 <
+                                           *g:claude_code_bracketed_paste*
+g:claude_code_bracketed_paste        Default: 1
+    Enable bracketed paste mode support. When enabled, terminal emulator
+    pastes (e.g. Ctrl-Shift-V) are captured and sent via |term_sendkeys()|
+    to avoid triggering Vim mappings.
 
                                        *g:claude_code_terminal_start_delay*
 g:claude_code_terminal_start_delay  Default: 300

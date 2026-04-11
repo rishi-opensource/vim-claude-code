@@ -19,6 +19,19 @@ function! claude_code#keymaps#setup_terminal(bufnr) abort
   execute 'tnoremap <buffer> <silent> <C-l> <C-\><C-n><C-w>l'
   execute 'tnoremap <buffer> <silent> ' . claude_code#config#get('map_zoom') . ' <C-\><C-n>:Claude zoom<CR>'
 
+  " Paste from system clipboard
+  let l:paste_key = claude_code#config#get('map_paste')
+  if !empty(l:paste_key)
+    execute 'tnoremap <buffer> <silent> ' . l:paste_key . ' <C-\><C-n>:call claude_code#terminal#paste()<CR>'
+  endif
+
+  " Bracketed paste support
+  if claude_code#config#get('bracketed_paste')
+    " This allows Vim to handle the escape sequence sent by terminal emulators
+    " during a paste. We bridge it to our mapping-free paste function.
+    execute 'tnoremap <buffer> <silent> <Esc>[200~ <C-\><C-n>:call claude_code#terminal#paste()<CR>'
+  endif
+
   " Mouse/touchpad scroll in terminal mode: escape to Normal, scroll, stay in
   " Normal so the user can keep reading.  Vim passes raw ScrollWheel events
   " through to the running program when in terminal mode, so we must intercept

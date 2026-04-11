@@ -242,6 +242,7 @@ let g:claude_code_map_zoom = '<C-w>z'
 | Normal | `<Leader>cV` | Toggle with `--verbose` |
 | Terminal | `<C-\>` | Hide Claude Code terminal |
 | Terminal | `<C-w>z` | **Zoom Toggle**: Maximize or restore terminal |
+| Terminal | `<C-v>` | **Paste**: Paste system clipboard content |
 | Terminal | `<C-h/j/k/l>` | Navigate to adjacent window |
 
 ### Extended keymaps (`g:claude_code_map_extended_prefix` + key)
@@ -307,6 +308,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_map_extended_keys` | `1` | Register `<Leader>c*` keymaps |
 | `g:claude_code_map_toggle` | `'<C-\>'` | Toggle key |
 | `g:claude_code_map_zoom` | `'<C-w>z'` | Zoom key |
+| `g:claude_code_map_paste` | `'<C-v>'` | Paste key |
 | `g:claude_code_map_continue` | `'<Leader>cC'` | Continue key |
 | `g:claude_code_map_verbose` | `'<Leader>cV'` | Verbose key |
 | `g:claude_code_map_extended_prefix` | `'<Leader>c'` | Prefix for all extended keymaps |
@@ -319,6 +321,7 @@ let g:claude_code_float_border = 'double'
 | `g:claude_code_model` | `''` | Claude model override |
 | `g:claude_code_debug` | `0` | Enable debug logging to message area |
 | `g:claude_code_diff_preview` | `0` | Auto-start diff preview polling on Vim startup |
+| `g:claude_code_bracketed_paste` | `1` | Enable bracketed paste mode support |
 | `g:claude_code_terminal_start_delay` | `300` | Delay (ms) before attaching to Claude terminal |
 
 Buffer-local `b:claude_code_*` overrides take precedence over `g:` variables.

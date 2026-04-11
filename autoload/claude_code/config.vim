@@ -34,6 +34,8 @@ let s:defaults = {
       \ 'map_continue':       '<Leader>cC',
       \ 'map_verbose':        '<Leader>cV',
       \ 'map_zoom':           '<C-w>z',
+      \ 'map_paste':          '<C-v>',
+      \ 'bracketed_paste':    1,
       \ 'debug':              0,
       \ 'terminal_start_delay': 300,
       \ 'scroll_keys':           1,
