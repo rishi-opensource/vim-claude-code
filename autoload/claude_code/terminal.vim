@@ -134,26 +134,42 @@ function! s:build_command(instance_id) abort
     let l:cmd .= ' ' . s:pending_variant
   endif
 
-  " Wrap in pushd/popd when using a git root different from cwd.
-  if claude_code#config#get('use_git_root') && a:instance_id !=# getcwd() && a:instance_id !=# 'global'
-    let l:cmd = 'pushd ' . shellescape(a:instance_id) . ' && ' . l:cmd . ' ; popd'
-  endif
-
   return l:cmd
+endfunction
+
+" Resolve the working directory for a terminal instance.
+" Returns the instance_id path (normalised for the OS) when it differs from
+" cwd, or an empty string when no directory change is needed.
+function! s:instance_cwd(instance_id) abort
+  if !claude_code#config#get('use_git_root') || a:instance_id ==# 'global'
+    return ''
+  endif
+  " Normalise both sides to forward slashes for a reliable comparison.
+  let l:inst = substitute(a:instance_id, '\\', '/', 'g')
+  let l:cwd  = substitute(getcwd(),      '\\', '/', 'g')
+  if l:inst ==# l:cwd
+    return ''
+  endif
+  " Return an OS-native path so term_start's cwd option works on all platforms.
+  if has('win32')
+    return substitute(a:instance_id, '/', '\\', 'g')
+  endif
+  return a:instance_id
 endfunction
 
 " Create a brand-new Claude Code terminal.
 function! s:create_new(instance_id) abort
   call claude_code#util#debug('terminal: creating new instance for ' . a:instance_id)
   let l:cmd = s:build_command(a:instance_id)
+  let l:cwd = s:instance_cwd(a:instance_id)
   let l:pos = claude_code#window#resolve_position(claude_code#config#get('position'))
 
   if l:pos ==# 'float' && has('popupwin')
-    let l:bufnr = s:create_float_terminal(l:cmd)
+    let l:bufnr = s:create_float_terminal(l:cmd, l:cwd)
   elseif l:pos ==# 'tab'
-    let l:bufnr = s:create_tab_terminal(l:cmd)
+    let l:bufnr = s:create_tab_terminal(l:cmd, l:cwd)
   else
-    let l:bufnr = s:create_split_terminal(l:cmd, l:pos)
+    let l:bufnr = s:create_split_terminal(l:cmd, l:pos, l:cwd)
   endif
 
   if l:bufnr <= 0
@@ -190,7 +206,7 @@ function! s:create_new(instance_id) abort
 endfunction
 
 " Create terminal inside a split window.
-function! s:create_split_terminal(cmd, position) abort
+function! s:create_split_terminal(cmd, position, cwd) abort
   let l:ratio = claude_code#config#get('split_ratio')
   let l:is_vertical = (a:position =~# 'vert')
 
@@ -207,6 +223,10 @@ function! s:create_split_terminal(cmd, position) abort
         \ 'norestore':   1,
         \ }
 
+  if !empty(a:cwd)
+    let l:term_opts['cwd'] = a:cwd
+  endif
+
   " Use term_start with vertical/horizontal option.
   if l:is_vertical
     let l:term_opts['vertical'] = 1
@@ -215,7 +235,7 @@ function! s:create_split_terminal(cmd, position) abort
     let l:term_opts['term_rows'] = l:size
   endif
 
-  let l:bufnr = term_start([&shell, '-c', a:cmd], l:term_opts)
+  let l:bufnr = term_start([&shell, &shellcmdflag, a:cmd], l:term_opts)
 
   " Move window to the correct edge.
   if l:is_vertical
@@ -241,28 +261,38 @@ function! s:create_split_terminal(cmd, position) abort
 endfunction
 
 " Create terminal inside a floating popup.
-function! s:create_float_terminal(cmd) abort
+function! s:create_float_terminal(cmd, cwd) abort
   let l:popup_opts = claude_code#window#build_float_opts(0)
 
-  let l:bufnr = term_start([&shell, '-c', a:cmd], {
+  let l:term_opts = {
         \ 'hidden': 1,
         \ 'term_finish': 'open',
         \ 'term_name':   'claude-code',
         \ 'norestore':   1,
-        \ })
+        \ }
+  if !empty(a:cwd)
+    let l:term_opts['cwd'] = a:cwd
+  endif
+
+  let l:bufnr = term_start([&shell, &shellcmdflag, a:cmd], l:term_opts)
 
   call popup_create(l:bufnr, l:popup_opts)
   return l:bufnr
 endfunction
 
 " Create terminal in a new tab.
-function! s:create_tab_terminal(cmd) abort
-  let l:bufnr = term_start([&shell, '-c', a:cmd], {
+function! s:create_tab_terminal(cmd, cwd) abort
+  let l:term_opts = {
         \ 'term_finish': 'open',
         \ 'term_name':   'claude-code',
         \ 'curwin':      0,
         \ 'norestore':   1,
-        \ })
+        \ }
+  if !empty(a:cwd)
+    let l:term_opts['cwd'] = a:cwd
+  endif
+
+  let l:bufnr = term_start([&shell, &shellcmdflag, a:cmd], l:term_opts)
   " Move to its own tab.
   execute 'tab sbuffer ' . l:bufnr
   " Close the split left behind in the original tab.
