@@ -18,6 +18,9 @@ let s:diff_bufs = []
 let s:poll_timer = -1
 let s:trigger_dir = ''
 let s:plugin_root = fnamemodify(resolve(expand('<sfile>:p')), ':h:h:h')
+if has('win32')
+  let s:plugin_root = substitute(s:plugin_root, '\\', '/', 'g')
+endif
 
 " ---------------------------------------------------------------------------
 " Polling — file-based IPC for hook → Vim communication
@@ -350,7 +353,16 @@ function! claude_code#diff#check_deps() abort
   let l:results = []
 
   if executable('python3')
-    call add(l:results, '[OK]   python3 found')
+    if has('win32')
+      let l:ver = systemlist('python3 --version')[0]
+      if l:ver =~# '^Python 3\.'
+        call add(l:results, '[OK]   python3 found (' . l:ver . ')')
+      else
+        call add(l:results, '[FAIL] python3 found but version is not 3.x (' . l:ver . ')')
+      endif
+    else
+      call add(l:results, '[OK]   python3 found')
+    endif
   else
     call add(l:results, '[FAIL] python3 not found — required for diff preview')
   endif

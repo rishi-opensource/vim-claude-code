@@ -52,6 +52,9 @@ Most AI coding tools pull you out of your editor — into a browser, a chat wind
 - [Claude Code CLI](https://docs.anthropic.com/en/docs/claude-code) installed and in `$PATH`
 - Optional: `+popupwin` for floating window mode
 - Optional: `python3` for diff preview (`:Claude preview`)
+  - Note: In Windows, there is a default python3 that redirects to the Windows Store.
+    Run `Claude doctor` to check if you have a valid python3 installation.
+    If you have Python 3, but your installation uses python.exe as the executable, create a python3 symlink.
 
 ## Installation
 
