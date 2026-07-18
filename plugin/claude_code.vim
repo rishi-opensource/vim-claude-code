@@ -208,7 +208,16 @@ function! s:preview_status() abort
   call claude_code#util#open_scratch('Claude: Preview Status', l:lines)
 endfunction
 
-" Auto-start polling if diff_preview is enabled
+" Auto-start polling if diff_preview is enabled.
+" Wrap in a VimEnter autocmd to allow Vim's setting shellxquote,
+" shellcmdflag, etc. before start_polling().
 if claude_code#config#get('diff_preview')
-  call claude_code#diff#start_polling()
+  if v:vim_did_enter
+    call claude_code#diff#start_polling()
+  else
+    augroup claude_code_diff_preview
+      autocmd!
+      autocmd VimEnter * call claude_code#diff#start_polling()
+    augroup END
+  endif
 endif
